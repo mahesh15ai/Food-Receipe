@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Food Recipe Generator{% endblock %}</title>
+    
+    <!-- Student Project CSS Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Favicon icon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
+</head>
+<body>
+
+    <!-- Simple, Clean Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-brand">
+                <span>🍲</span> RecipeAI
+            </a>
+
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">🏠 Home</a></li>
+                    <li><a href="{{ url_for('recipes') }}" class="{% if request.endpoint in ['recipes', 'recipe_details'] %}active{% endif %}">📖 Recipes</a></li>
+                    <li><a href="{{ url_for('chatbot') }}" class="{% if request.endpoint == 'chatbot' %}active{% endif %}">👨‍🍳 Chef Chatbot</a></li>
+                    <li>
+                        <a href="{{ url_for('favourites') }}" class="{% if request.endpoint == 'favourites' %}active{% endif %}">
+                            ❤️ Favourites 
+                            <span class="count-badge" id="fav-count-badge">{{ fav_count }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        {% if api_ready %}
+                            <span class="api-pill active" title="AI Assistant is active">🟢 AI Ready</span>
+                        {% else %}
+                            <span class="api-pill inactive" title="Set GEMINI_API_KEY in .env file">🔴 Setup Key</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-banner alert-{{ category }}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Friendly Banner if API Key is Missing -->
+        {% if not api_ready %}
+            <div class="alert-banner alert-warning">
+                <div>
+                    <strong>🔑 Notice:</strong> API Key is not yet configured in your <code>.env</code> file.
+                    Please add your <code>GEMINI_API_KEY</code> from <a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: underline; font-weight: bold;">Google AI Studio</a> to generate recipes and chat with Chef AI.
+                </div>
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 <strong>AI Food Recipe Generator</strong> &bull; Cook delicious meals with everyday ingredients</p>
+        </div>
+    </footer>
+
+    <!-- Client-Side JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

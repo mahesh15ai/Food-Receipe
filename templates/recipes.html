@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Generated Recipes - AI Food Recipe Generator{% endblock %}
+
+{% block content %}
+<div style="margin: 25px 0 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h1 style="color: var(--primary-green); font-size: 1.8rem; font-weight: 800;">
+            🍲 Generated Recipes
+        </h1>
+        {% if ingredients_input %}
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Based on ingredients: <strong>{{ ingredients_input }}</strong> &bull; Category: <strong>{{ category }}</strong>
+            </p>
+        {% endif %}
+    </div>
+
+    <div>
+        <a href="{{ url_for('index') }}" class="btn btn-outline" style="padding: 9px 18px; font-size: 0.9rem;">
+            ← Generate New Recipes
+        </a>
+    </div>
+</div>
+
+<!-- Error Display if Generation Failed -->
+{% if error_message %}
+    <div class="generator-card" style="border-color: #EF5350; background-color: #FFFAFA; margin-top: 20px;">
+        <h3 style="color: #C62828; margin-bottom: 10px;">⚠️ Generation Notice</h3>
+        <p style="color: var(--text-primary); margin-bottom: 15px; font-size: 1rem;">{{ error_message }}</p>
+
+        {% if "API key is not configured" in error_message or "API key is missing" in error_message %}
+            <div style="background-color: #FFF3E0; border: 1px solid #FFE0B2; padding: 14px 18px; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 20px;">
+                <strong>Quick Fix:</strong> 
+                Open the <code>.env</code> file in your project folder and set your API key:
+                <br>
+                <code>GEMINI_API_KEY=AIzaSy...your_real_key_here</code>
+            </div>
+        {% else %}
+            <div style="background-color: #E8F5E9; border: 1px solid #C8E6C9; padding: 14px 18px; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 20px; color: var(--primary-green-dark);">
+                💡 <strong>Tip:</strong> High traffic spikes are temporary and usually resolve in seconds. Click the button below to retry!
+            </div>
+        {% endif %}
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {% if ingredients_input %}
+                <form action="{{ url_for('generate') }}" method="POST" style="display: inline;">
+                    <input type="hidden" name="ingredients" value="{{ ingredients_input }}">
+                    <input type="hidden" name="category" value="{{ category }}">
+                    <input type="hidden" name="language" value="{{ language }}">
+                    <button type="submit" class="btn btn-primary">🔄 Try Generating Again</button>
+                </form>
+            {% endif %}
+            <a href="{{ url_for('index') }}" class="btn btn-outline">Return to Home</a>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Recipe Cards Grid -->
+{% if recipes and recipes|length > 0 %}
+    <div class="recipes-grid">
+        {% for recipe in recipes %}
+            <div class="recipe-card">
+                <div>
+                    <!-- Header Badges -->
+                    <div class="card-header-badges">
+                        <span class="category-tag">{{ recipe.category or 'Home Style' }}</span>
+                        <span class="difficulty-tag">⚡ {{ recipe.difficulty or 'Easy' }}</span>
+                    </div>
+
+                    <!-- Recipe Title -->
+                    <h2 class="recipe-title">{{ recipe.title }}</h2>
+
+                    <!-- Short Description -->
+                    <p class="recipe-desc">{{ recipe.description }}</p>
+
+                    <!-- Recipe Stats Bar -->
+                    <div class="recipe-stats-row">
+                        <div class="stat-item" title="Prep Time">
+                            ⏱️ <span>{{ recipe.prep_time }}</span>
+                        </div>
+                        <div class="stat-item" title="Cook Time">
+                            🍳 <span>{{ recipe.cook_time }}</span>
+                        </div>
+                        <div class="stat-item" title="Calories">
+                            🥗 <span>{{ recipe.calories }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Ingredients Preview -->
+                    <div style="margin-bottom: 15px;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Key Ingredients:</span>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px;">
+                            {% if recipe.ingredients is iterable and recipe.ingredients is not string %}
+                                {{ recipe.ingredients[:3]|join(", ") }}{% if recipe.ingredients|length > 3 %} and more...{% endif %}
+                            {% else %}
+                                {{ recipe.ingredients }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card-actions">
+                    <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn btn-primary">
+                        📖 View Steps
+                    </a>
+                    <button 
+                        class="btn btn-outline btn-save-fav" 
+                        data-id="{{ recipe.id }}"
+                        title="Save this recipe to SQLite favourites"
+                    >
+                        ❤️ Save
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Chef Chatbot Promotion Banner -->
+    <div class="generator-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; background-color: var(--primary-green-light); border-color: var(--primary-green-border);">
+        <div>
+            <h3 style="color: var(--primary-green-dark); margin-bottom: 4px;">👨‍🍳 Have cooking questions about these recipes?</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Ask Chef AI for ingredient substitutions, tips to improve taste, or quick cooking tricks!</p>
+        </div>
+        <a href="{{ url_for('chatbot') }}" class="btn btn-accent">Ask Chef AI Now &rarr;</a>
+    </div>
+
+{% elif not error_message %}
+    <!-- Empty State -->
+    <div class="generator-card" style="text-align: center; padding: 50px 20px; margin-top: 20px;">
+        <span style="font-size: 3rem;">🥣</span>
+        <h2 style="color: var(--primary-green); margin: 15px 0 10px;">No Recipes Generated Yet</h2>
+        <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 25px;">
+            Head over to the home page, enter whatever ingredients you have in your kitchen, and let AI create 3 custom dishes!
+        </p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">🍲 Enter Ingredients Now</a>
+    </div>
+{% endif %}
+{% endblock %}

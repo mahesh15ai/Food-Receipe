@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }} - Recipe Details{% endblock %}
+
+{% block content %}
+<div class="details-container">
+    <!-- Header Section -->
+    <div class="details-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 10px;">
+            <div>
+                <span class="category-tag">{{ recipe.category or 'General' }}</span>
+                <span class="difficulty-tag" style="margin-left: 8px;">⚡ {{ recipe.difficulty or 'Easy' }}</span>
+                {% if recipe.language == 'hi' %}
+                    <span class="difficulty-tag" style="margin-left: 8px;">🌐 हिन्दी</span>
+                {% elif recipe.language == 'mr' %}
+                    <span class="difficulty-tag" style="margin-left: 8px;">🌐 मराठी</span>
+                {% endif %}
+            </div>
+
+            <!-- Print Button (Triggers window.print) -->
+            <button id="btn-print-recipe" class="btn btn-outline" style="padding: 7px 15px; font-size: 0.88rem;">
+                🖨️ Print Recipe
+            </button>
+        </div>
+
+        <h1 class="details-title">{{ recipe.title }}</h1>
+        <p class="details-desc">{{ recipe.description }}</p>
+
+        <!-- Meta ribbon -->
+        <div class="details-meta-ribbon">
+            <div class="meta-pill">
+                <span>⏱️</span>
+                <span><strong>Prep:</strong> {{ recipe.prep_time }}</span>
+            </div>
+            <div class="meta-pill">
+                <span>🍳</span>
+                <span><strong>Cook:</strong> {{ recipe.cook_time }}</span>
+            </div>
+            <div class="meta-pill">
+                <span>⚡</span>
+                <span><strong>Difficulty:</strong> {{ recipe.difficulty }}</span>
+            </div>
+            <div class="meta-pill">
+                <span>🥗</span>
+                <span><strong>Calories:</strong> {{ recipe.calories }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content: Ingredients & Instructions Grid -->
+    <div class="details-grid">
+        <!-- Column 1: Ingredients -->
+        <div>
+            <h2 class="section-heading">
+                <span>🧺</span> Ingredients Needed
+            </h2>
+            <div class="ingredients-card">
+                <ul class="ingredients-list">
+                    {% if recipe.ingredients is iterable and recipe.ingredients is not string %}
+                        {% for ing in recipe.ingredients %}
+                            <li>
+                                <span class="check-dot">✔</span>
+                                <span>{{ ing }}</span>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li>{{ recipe.ingredients }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <!-- Nutritional Info Box -->
+            <div class="nutrition-box" style="margin-top: 25px;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary-green); margin-bottom: 5px;">
+                    📊 Estimated Nutritional Values
+                </h3>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+                    Approximate values per serving:
+                </p>
+                <div class="nutrition-pills">
+                    {% if recipe.nutrition is mapping %}
+                        {% for key, val in recipe.nutrition.items() %}
+                            <div class="nutri-tag">
+                                <strong>{{ key|title }}:</strong> {{ val }}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="nutri-tag">
+                            <strong>Calories:</strong> {{ recipe.calories }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 2: Step-by-Step Cooking Steps -->
+        <div>
+            <h2 class="section-heading">
+                <span>🍳</span> Step-by-Step Cooking Instructions
+            </h2>
+
+            <ol class="instructions-list">
+                {% if recipe.instructions is iterable and recipe.instructions is not string %}
+                    {% for step in recipe.instructions %}
+                        <li>{{ step }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>{{ recipe.instructions }}</li>
+                {% endif %}
+            </ol>
+
+            <!-- Chef Tips -->
+            {% if recipe.tips %}
+                <div class="callout-box callout-tips">
+                    <strong style="display: block; margin-bottom: 4px;">💡 Chef's Pro Tip:</strong>
+                    <span>{{ recipe.tips }}</span>
+                </div>
+            {% endif %}
+
+            <!-- Substitutes -->
+            {% if recipe.substitutes %}
+                <div class="callout-box callout-substitutes">
+                    <strong style="display: block; margin-bottom: 4px;">🔄 Ingredient Substitutions:</strong>
+                    <span>{{ recipe.substitutes }}</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="details-actions-bar">
+        {% if recipe.is_favourite or recipe.source == 'favourites' %}
+            <button class="btn btn-accent" disabled>
+                ❤️ Saved in Favourites
+            </button>
+        {% else %}
+            <button 
+                class="btn btn-accent btn-save-fav" 
+                data-id="{{ recipe.id }}"
+            >
+                ❤️ Save to Favourites
+            </button>
+        {% endif %}
+
+        <a href="{{ url_for('recipes') }}" class="btn btn-outline">
+            ← Back to Recipes
+        </a>
+
+        <a href="{{ url_for('chatbot') }}" class="btn btn-outline" style="margin-left: auto;">
+            👨‍🍳 Ask Chef AI Questions
+        </a>
+    </div>
+</div>
+{% endblock %}

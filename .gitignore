@@ -1,0 +1,23 @@
+# Environment variables file with secret API keys
+.env
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# SQLite database local data (keep schema, ignore personal saved data if needed)
+database/*.db-journal
+
+# VS Code and editor settings
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db

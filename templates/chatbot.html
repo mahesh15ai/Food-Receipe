@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Chef AI Chatbot - Cooking Assistant{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Chatbot Header -->
+    <div class="chat-header">
+        <div class="chat-chef-info">
+            <span class="chef-avatar">👨‍🍳</span>
+            <div>
+                <h1 class="chat-chef-title">Chef AI Assistant</h1>
+                <p class="chat-chef-sub">Ask any cooking question, ingredient substitute, or recipe tip</p>
+            </div>
+        </div>
+
+        <div>
+            <!-- Chat Language Selector -->
+            <label for="chat-language" style="font-size: 0.8rem; font-weight: 700; color: var(--primary-green-dark); margin-right: 5px;">Language:</label>
+            <select id="chat-language" class="select-box" style="padding: 6px 10px; font-size: 0.85rem; width: auto; display: inline-block;">
+                <option value="en" selected>English</option>
+                <option value="hi">हिन्दी (Hindi)</option>
+                <option value="mr">मराठी (Marathi)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Chat Messages Scroll Area -->
+    <div class="chat-messages" id="chat-messages">
+        <!-- Default Welcome Message from Bot -->
+        <div class="message-row bot-row">
+            <div class="message-bubble">
+                Hello! I am your AI Chef assistant 👨‍🍳. 
+                <br><br>
+                You can ask me anything about cooking, like:
+                <ul style="margin: 8px 0 0 20px;">
+                    <li><em>"What can I cook with potatoes and onions?"</em></li>
+                    <li><em>"How do I make a simple paneer curry?"</em></li>
+                    <li><em>"Suggest a healthy 15-minute breakfast."</em></li>
+                    <li><em>"What can I use instead of tomatoes?"</em></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Question Suggestion Chips -->
+    <div class="chat-quick-chips">
+        <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Try Asking:</span>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I cook with potatoes and onions?">
+            🥔 Cook with potatoes?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="How do I make a quick paneer curry?">
+            🧀 Quick paneer curry?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="Suggest a simple 15-minute breakfast.">
+            🍳 15-minute breakfast?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I use instead of tomatoes in curry?">
+            🍅 Substitute for tomatoes?
+        </button>
+    </div>
+
+    <!-- Chat Input Form -->
+    <form class="chat-input-area" id="chat-form">
+        <input 
+            type="text" 
+            id="chat-input" 
+            class="chat-input" 
+            placeholder="Type your cooking question here... (e.g. How do I boil eggs perfectly?)"
+            autocomplete="off"
+            required
+        >
+        <button type="submit" class="btn btn-primary" style="padding: 12px 20px;">
+            Send 🚀
+        </button>
+    </form>
+</div>
+{% endblock %}

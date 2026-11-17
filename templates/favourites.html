@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}My Favourite Recipes - SQLite Saved{% endblock %}
+
+{% block content %}
+<div style="margin: 25px 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h1 style="color: var(--primary-green); font-size: 1.8rem; font-weight: 800;">
+            ❤️ Saved Favourite Recipes
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            Stored permanently in your local <strong>SQLite database</strong> (<code>database/recipes.db</code>).
+        </p>
+    </div>
+
+    <div>
+        <a href="{{ url_for('index') }}" class="btn btn-primary" style="padding: 9px 18px; font-size: 0.9rem;">
+            + Generate More Recipes
+        </a>
+    </div>
+</div>
+
+<div id="favourites-container">
+    {% if favourites and favourites|length > 0 %}
+        <div class="recipes-grid">
+            {% for fav in favourites %}
+                <div class="recipe-card" id="fav-card-{{ fav.id }}">
+                    <div>
+                        <!-- Header Badges -->
+                        <div class="card-header-badges">
+                            <span class="category-tag">{{ fav.category or 'General' }}</span>
+                            <span class="difficulty-tag">⚡ {{ fav.difficulty or 'Easy' }}</span>
+                        </div>
+
+                        <!-- Recipe Title -->
+                        <h2 class="recipe-title">{{ fav.title }}</h2>
+
+                        <!-- Short Description -->
+                        <p class="recipe-desc">{{ fav.description }}</p>
+
+                        <!-- Stats Bar -->
+                        <div class="recipe-stats-row">
+                            <div class="stat-item">
+                                ⏱️ <span>{{ fav.prep_time }}</span>
+                            </div>
+                            <div class="stat-item">
+                                🍳 <span>{{ fav.cook_time }}</span>
+                            </div>
+                            <div class="stat-item">
+                                🥗 <span>{{ fav.calories }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Saved timestamp -->
+                        <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+                            📅 Saved on: {{ fav.created_at }}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card-actions">
+                        <a href="{{ url_for('recipe_details', recipe_id=fav.id) }}" class="btn btn-primary">
+                            📖 View Full Recipe
+                        </a>
+                        <button 
+                            class="btn btn-outline-danger btn-remove-fav" 
+                            data-id="{{ fav.id }}"
+                            title="Delete this recipe from SQLite database"
+                        >
+                            🗑️ Remove
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="generator-card" style="text-align: center; padding: 50px 20px;">
+            <span style="font-size: 3rem;">📖</span>
+            <h2 style="color: var(--primary-green); margin: 15px 0 10px;">No Favourite Recipes Yet</h2>
+            <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 25px;">
+                You haven't saved any recipes to your favourites yet. Generate some recipes from your kitchen ingredients and click <strong>"❤️ Save"</strong>!
+            </p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">🍲 Generate Recipes Now</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

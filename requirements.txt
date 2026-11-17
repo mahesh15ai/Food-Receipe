@@ -1,0 +1,12 @@
+# Web Framework
+Flask>=3.0.0
+
+# Environment Variable Management
+python-dotenv>=1.0.0
+
+# Official Google Gemini AI SDK
+google-genai>=0.1.0
+google-generativeai>=0.8.0
+
+# Data processing (optional)
+pandas>=2.0.0
