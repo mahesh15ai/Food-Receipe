@@ -37,6 +37,10 @@
                 <span><strong>Cook:</strong> {{ recipe.cook_time }}</span>
             </div>
             <div class="meta-pill">
+                <span>🍽️</span>
+                <span><strong>Serves:</strong> {{ recipe.servings or '2 servings' }}</span>
+            </div>
+            <div class="meta-pill">
                 <span>⚡</span>
                 <span><strong>Difficulty:</strong> {{ recipe.difficulty }}</span>
             </div>
@@ -134,21 +138,47 @@
                 ❤️ Saved in Favourites
             </button>
         {% else %}
-            <button 
-                class="btn btn-accent btn-save-fav" 
+            <button
+                class="btn btn-accent btn-save-fav"
                 data-id="{{ recipe.id }}"
             >
                 ❤️ Save to Favourites
             </button>
         {% endif %}
 
+        <button id="btn-shopping-list" class="btn btn-outline" data-id="{{ recipe.id }}" title="Copy shopping list to clipboard">
+            🛒 Shopping List
+        </button>
+
         <a href="{{ url_for('recipes') }}" class="btn btn-outline">
             ← Back to Recipes
         </a>
 
         <a href="{{ url_for('chatbot') }}" class="btn btn-outline" style="margin-left: auto;">
-            👨‍🍳 Ask Chef AI Questions
+            👨‍🍳 Ask Chef AI
         </a>
     </div>
 </div>
+
+{% block scripts %}
+<script>
+document.getElementById('btn-shopping-list').addEventListener('click', function() {
+    const recipeId = this.getAttribute('data-id');
+    const btn = this;
+    fetch('/api/shopping-list/' + recipeId)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const text = '🛒 Shopping List for: ' + data.title + '\n\n' +
+                    data.shopping_list.map((item, i) => (i + 1) + '. ' + item).join('\n');
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        btn.innerHTML = '✅ Copied!';
+                        setTimeout(() => { btn.innerHTML = '🛒 Shopping List'; }, 2500);
+                    }).catch(() => alert(text));
+                } else { alert(text); }
+            }
+        });
+});
+</script>
 {% endblock %}

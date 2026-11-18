@@ -10,18 +10,24 @@
             <span class="chef-avatar">👨‍🍳</span>
             <div>
                 <h1 class="chat-chef-title">Chef AI Assistant</h1>
-                <p class="chat-chef-sub">Ask any cooking question, ingredient substitute, or recipe tip</p>
+                <p class="chat-chef-sub">Ask anything — recipes, substitutes, tips, timings, storage ⚡ Fast answers</p>
             </div>
         </div>
 
-        <div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <!-- Daily Tip Button -->
+            <button id="btn-daily-tip" class="btn btn-outline" style="padding:6px 12px; font-size:0.82rem;">
+                💡 Random Tip
+            </button>
             <!-- Chat Language Selector -->
-            <label for="chat-language" style="font-size: 0.8rem; font-weight: 700; color: var(--primary-green-dark); margin-right: 5px;">Language:</label>
-            <select id="chat-language" class="select-box" style="padding: 6px 10px; font-size: 0.85rem; width: auto; display: inline-block;">
-                <option value="en" selected>English</option>
-                <option value="hi">हिन्दी (Hindi)</option>
-                <option value="mr">मराठी (Marathi)</option>
-            </select>
+            <div>
+                <label for="chat-language" style="font-size: 0.8rem; font-weight: 700; color: var(--primary-green-dark); margin-right: 5px;">Language:</label>
+                <select id="chat-language" class="select-box" style="padding: 6px 10px; font-size: 0.85rem; width: auto; display: inline-block;">
+                    <option value="en" selected>English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -30,14 +36,15 @@
         <!-- Default Welcome Message from Bot -->
         <div class="message-row bot-row">
             <div class="message-bubble">
-                Hello! I am your AI Chef assistant 👨‍🍳. 
+                👨‍🍳 Hello! I'm your <strong>Chef AI</strong> — ask me anything about cooking!
                 <br><br>
-                You can ask me anything about cooking, like:
+                Try asking:
                 <ul style="margin: 8px 0 0 20px;">
                     <li><em>"What can I cook with potatoes and onions?"</em></li>
-                    <li><em>"How do I make a simple paneer curry?"</em></li>
-                    <li><em>"Suggest a healthy 15-minute breakfast."</em></li>
-                    <li><em>"What can I use instead of tomatoes?"</em></li>
+                    <li><em>"How do I make a quick paneer curry?"</em></li>
+                    <li><em>"Healthy 15-minute breakfast ideas?"</em></li>
+                    <li><em>"What replaces eggs in baking?"</em></li>
+                    <li><em>"How long to boil pasta?"</em></li>
                 </ul>
             </div>
         </div>
@@ -46,27 +53,23 @@
     <!-- Quick Question Suggestion Chips -->
     <div class="chat-quick-chips">
         <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Try Asking:</span>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I cook with potatoes and onions?">
-            🥔 Cook with potatoes?
-        </button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="How do I make a quick paneer curry?">
-            🧀 Quick paneer curry?
-        </button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="Suggest a simple 15-minute breakfast.">
-            🍳 15-minute breakfast?
-        </button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I use instead of tomatoes in curry?">
-            🍅 Substitute for tomatoes?
-        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I cook with potatoes and onions?">🥔 Potatoes & onions?</button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="How do I make a quick paneer curry?">🧀 Quick paneer curry?</button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="Suggest a healthy 15-minute breakfast.">🍳 15-min breakfast?</button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I use instead of tomatoes in curry?">🍅 Tomato substitute?</button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="How do I make fluffy rice?">🍚 Fluffy rice?</button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="Give me a simple egg recipe.">🥚 Egg recipe?</button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="What spices go well with chicken?">🍗 Chicken spices?</button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="How to reduce spiciness in a curry?">🌶️ Less spicy curry?</button>
     </div>
 
     <!-- Chat Input Form -->
     <form class="chat-input-area" id="chat-form">
-        <input 
-            type="text" 
-            id="chat-input" 
-            class="chat-input" 
-            placeholder="Type your cooking question here... (e.g. How do I boil eggs perfectly?)"
+        <input
+            type="text"
+            id="chat-input"
+            class="chat-input"
+            placeholder="Ask anything: recipe ideas, cooking tips, substitutes, timings..."
             autocomplete="off"
             required
         >
@@ -75,4 +78,29 @@
         </button>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Daily tip button
+document.getElementById('btn-daily-tip').addEventListener('click', function() {
+    fetch('/api/random-tip')
+        .then(r => r.json())
+        .then(data => {
+            if (data.tip) {
+                const chatMessages = document.getElementById('chat-messages');
+                const row = document.createElement('div');
+                row.className = 'message-row bot-row';
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                bubble.style.background = 'linear-gradient(135deg, #E8F5E9, #F1F8E9)';
+                bubble.style.borderLeft = '4px solid var(--primary-green)';
+                bubble.innerHTML = '<strong>💡 Chef\'s Random Tip:</strong><br>' + data.tip;
+                row.appendChild(bubble);
+                chatMessages.appendChild(row);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+});
+</script>
 {% endblock %}

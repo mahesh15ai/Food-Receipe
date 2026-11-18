@@ -280,6 +280,55 @@ def api_status():
 
 
 # -----------------------------------------------------------
+# Route 11: Shopping List Generator
+# -----------------------------------------------------------
+@app.route("/api/shopping-list/<int:recipe_id>")
+def api_shopping_list(recipe_id):
+    """
+    Returns the ingredients of a recipe as a plain shopping list (JSON).
+    """
+    recipe = database.get_recipe_by_id(recipe_id)
+    if not recipe:
+        return jsonify({"success": False, "message": "Recipe not found."}), 404
+
+    ingredients = recipe.get("ingredients", [])
+    if isinstance(ingredients, str):
+        ingredients = [ingredients]
+
+    return jsonify({
+        "success": True,
+        "title": recipe.get("title", "Recipe"),
+        "shopping_list": ingredients
+    })
+
+
+# -----------------------------------------------------------
+# Route 12: Random Quick Recipe Suggestion
+# -----------------------------------------------------------
+@app.route("/api/random-tip")
+def api_random_tip():
+    """
+    Returns a quick random cooking tip from Chef AI.
+    """
+    tips = [
+        "🧄 Always sauté garlic on medium heat — high heat turns it bitter in seconds!",
+        "🍳 Let your pan heat up fully before adding oil — it prevents sticking.",
+        "🧂 Salt pasta water generously — it should taste like the sea!",
+        "🥚 For fluffier scrambled eggs, whisk in a splash of cold water, not milk.",
+        "🍅 Add a pinch of sugar to tomato-based sauces to balance acidity.",
+        "🧅 Refrigerate onions for 15 minutes before cutting to avoid teary eyes!",
+        "🍚 Rinse rice 2-3 times before cooking to remove excess starch.",
+        "🫒 Add olive oil after cooking, not before — it preserves its flavor.",
+        "🌶️ Remove seeds from chili for less heat but full flavor.",
+        "🥦 Steam vegetables instead of boiling to retain more nutrients.",
+        "🍋 Squeeze lemon at the END of cooking to keep its bright fresh flavor.",
+        "🧈 Brown butter (not just melt it!) adds a rich nutty depth to any dish.",
+    ]
+    import random
+    return jsonify({"success": True, "tip": random.choice(tips)})
+
+
+# -----------------------------------------------------------
 # Run Application
 # -----------------------------------------------------------
 if __name__ == "__main__":

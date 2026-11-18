@@ -190,9 +190,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const bubble = document.createElement("div");
         bubble.className = "message-bubble";
 
-        // Convert newlines to breaks and simple bullets
-        let formattedText = escapeHtml(text).replace(/\n/g, "<br>");
-        bubble.innerHTML = formattedText;
+        // Format: bold **text**, newlines → <br>, numbered & bullet lists
+        let formatted = escapeHtml(text)
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n(\d+)\.\s/g, '<br><strong>$1.</strong> ')
+            .replace(/\n[-•]\s/g, '<br>• ')
+            .replace(/\n/g, '<br>');
+        bubble.innerHTML = formatted;
 
         row.appendChild(bubble);
         chatMessages.appendChild(row);
@@ -205,10 +209,13 @@ document.addEventListener("DOMContentLoaded", function () {
         row.id = "typing-indicator";
 
         const bubble = document.createElement("div");
-        bubble.className = "message-bubble";
-        bubble.style.fontStyle = "italic";
-        bubble.style.color = "var(--text-muted)";
-        bubble.innerHTML = "👨‍🍳 Chef AI is preparing an answer...";
+        bubble.className = "message-bubble typing-bubble";
+        bubble.innerHTML = `
+            <span class="typing-dots">
+                <span></span><span></span><span></span>
+            </span>
+            <span style="font-size:0.82rem; color:var(--text-muted); margin-left:8px;">Chef AI is cooking up an answer...</span>
+        `;
 
         row.appendChild(bubble);
         chatMessages.appendChild(row);

@@ -352,7 +352,7 @@ def generate_recipes(ingredients_input, category="All", language="en"):
     }
     lang_prompt = lang_instructions.get(language, lang_instructions["en"])
 
-    # Prompt Engineering for Fast, Structured Single Recipe Output
+    # Prompt Engineering for Fast, Structured 3-Recipe Output
     prompt = f"""
 You are an expert chef. The user wants to cook using these available ingredients:
 Available Ingredients: {ingredients_str}
@@ -360,23 +360,25 @@ Requested Category: {category}
 
 {lang_prompt}
 
-Generate EXACTLY 1 perfect, practical, and delicious home-style recipe that best utilizes the provided ingredients (along with basic kitchen staples like salt, oil, water, and spices).
+Generate EXACTLY 3 distinct, practical, and delicious home-style recipes that best utilize the provided ingredients (along with basic kitchen staples like salt, oil, water, and spices).
 
 Strict Requirements:
 1. Follow the requested category: '{category}'. If 'Vegetarian', no meat/fish/egg. If 'Vegan', no dairy/honey/meat.
-2. Return ONLY a valid JSON array of EXACTLY 1 recipe object. Keep it concise, direct, and fast.
-3. Every recipe must follow this exact JSON structure:
+2. Make all 3 recipes DIFFERENT from each other — different cooking methods, dish types, or flavor profiles.
+3. Return ONLY a valid JSON array of EXACTLY 3 recipe objects. No extra text.
+4. Every recipe must follow this exact JSON structure:
 [
   {{
     "title": "Recipe Name",
-    "description": "A short, appetizing description of the dish.",
+    "description": "A short, appetizing 1-2 sentence description.",
     "category": "{category if category != 'All' else 'Everyday Meal'}",
     "prep_time": "10 mins",
     "cook_time": "15 mins",
+    "servings": "2 servings",
     "difficulty": "Easy",
     "calories": "290 kcal",
     "ingredients": [
-      "Ingredients with practical measurements",
+      "Ingredient with measurement",
       "Salt to taste"
     ],
     "instructions": [
@@ -389,10 +391,11 @@ Strict Requirements:
       "calories": "290 kcal",
       "protein": "6g",
       "carbohydrates": "40g",
-      "fat": "9g"
+      "fat": "9g",
+      "fiber": "3g"
     }},
-    "tips": "Chef's tip for extra flavor.",
-    "substitutes": "Alternative ingredient suggestions."
+    "tips": "Chef's pro tip for extra flavor or texture.",
+    "substitutes": "Smart ingredient substitution suggestions."
   }}
 ]
 """
@@ -424,17 +427,18 @@ Strict Requirements:
             recipe.setdefault('category', category)
             recipe.setdefault('prep_time', '10 mins')
             recipe.setdefault('cook_time', '15 mins')
+            recipe.setdefault('servings', '2 servings')
             recipe.setdefault('difficulty', 'Easy')
             recipe.setdefault('calories', '290 kcal')
             recipe.setdefault('ingredients', [])
             recipe.setdefault('instructions', [])
-            recipe.setdefault('nutrition', {'calories': '290 kcal', 'protein': '6g', 'carbohydrates': '40g', 'fat': '9g'})
+            recipe.setdefault('nutrition', {'calories': '290 kcal', 'protein': '6g', 'carbohydrates': '40g', 'fat': '9g', 'fiber': '3g'})
             recipe.setdefault('tips', 'Serve hot for the best taste.')
             recipe.setdefault('substitutes', 'Basic cooking spices can be adjusted to taste.')
 
         return {
             "success": True,
-            "recipes": recipes[:1],  # return exactly 1 perfect recipe
+            "recipes": recipes[:3],  # return up to 3 recipes
             "model_used": model_used
         }
 
@@ -443,7 +447,7 @@ Strict Requirements:
         recipes = generate_smart_recipes(ingredients_str, category=category, language=language)
         return {
             "success": True,
-            "recipes": recipes[:1],
+            "recipes": recipes[:3],
             "model_used": "Smart Culinary Engine"
         }
     except Exception as e:
@@ -452,7 +456,7 @@ Strict Requirements:
         recipes = generate_smart_recipes(ingredients_str, category=category, language=language)
         return {
             "success": True,
-            "recipes": recipes[:1],
+            "recipes": recipes[:3],
             "model_used": "Smart Culinary Engine"
         }
 
@@ -497,21 +501,25 @@ def ask_chef_chatbot(user_message, conversation_history=None, language="en"):
     lang_instruction = lang_rules.get(language, lang_rules["en"])
 
     system_instruction = f"""
-You are 'Chef AI', a friendly, encouraging, and experienced home chef assisting home cooks and beginners.
-Your personality: Warm, practical, encouraging, and clear.
+You are 'Chef AI', a friendly, fast, and experienced home chef helping home cooks instantly.
+Your personality: Warm, practical, encouraging, and concise.
 You specialize in:
 1. Suggesting dishes from common household ingredients.
-2. Step-by-step easy cooking instructions.
+2. Quick step-by-step easy cooking instructions (keep steps short and clear).
 3. Smart ingredient substitutes (e.g., lemon/curd for tomatoes, flaxseed for eggs).
 4. Cooking tips that save time and reduce food waste.
+5. Answering ANY cooking question instantly — timings, temperatures, storage, food pairing.
 
 Language Requirement:
 {lang_instruction}
 
-Formatting:
-- Keep explanations structured and easy to read.
-- Use bullet points for steps or ingredient ideas.
-- Keep the tone polite, friendly, and concise (do not write overly long essays).
+Formatting Rules (VERY IMPORTANT):
+- Answer IMMEDIATELY and DIRECTLY — no long introductions.
+- Use **bold** for dish names or key terms.
+- Use numbered lists for steps, bullet points for options.
+- Keep total response under 200 words unless a full recipe is asked.
+- If asked for a recipe, provide: ingredients list + 4-5 clear steps.
+- Always end with a quick encouraging tip. 🍳
 """
 
     full_prompt = f"{system_instruction}\n\nUser Question: {user_message.strip()}\nChef AI Answer:"
