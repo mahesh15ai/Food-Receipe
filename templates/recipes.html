@@ -1,97 +1,76 @@
 {% extends "base.html" %}
 
-{% block title %}Generated Recipes - AI Food Recipe Generator{% endblock %}
+{% block title %}My Recipes - Mahilicious{% endblock %}
 
 {% block content %}
-<div style="margin: 25px 0 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+<!-- Page Header with CRUD Controls -->
+<div style="margin: 24px 0 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
     <div>
-        <h1 style="color: var(--primary-green); font-size: 1.8rem; font-weight: 800;">
-            🍲 Generated Recipes
+        <h1 style="font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
+            <i class="fa-solid fa-utensils text-primary"></i> Recipe Studio & Collection
         </h1>
-        {% if ingredients_input %}
-            <p style="color: var(--text-secondary); font-size: 0.95rem;">
-                Based on ingredients: <strong>{{ ingredients_input }}</strong> &bull; Category: <strong>{{ category }}</strong>
-            </p>
-        {% endif %}
+        <p style="color: var(--text-muted); font-size: 0.96rem;">
+            Manage your dynamic recipes in <strong>SQLite database</strong> &bull; Full CRUD (Create, Read, Update, Delete)
+        </p>
     </div>
 
-    <div>
-        <a href="{{ url_for('index') }}" class="btn btn-outline" style="padding: 9px 18px; font-size: 0.9rem;">
-            ← Generate New Recipes
+    <!-- Header CRUD Action Buttons -->
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-primary" id="btn-open-create-modal">
+            <i class="fa-solid fa-plus"></i> Add Custom Recipe
+        </button>
+        <a href="{{ url_for('index') }}" class="btn btn-outline">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Recipes
         </a>
     </div>
 </div>
 
-<!-- Error Display if Generation Failed -->
-{% if error_message %}
-    <div class="generator-card" style="border-color: #EF5350; background-color: #FFFAFA; margin-top: 20px;">
-        <h3 style="color: #C62828; margin-bottom: 10px;">⚠️ Generation Notice</h3>
-        <p style="color: var(--text-primary); margin-bottom: 15px; font-size: 1rem;">{{ error_message }}</p>
-
-        {% if "API key is not configured" in error_message or "API key is missing" in error_message %}
-            <div style="background-color: #FFF3E0; border: 1px solid #FFE0B2; padding: 14px 18px; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 20px;">
-                <strong>Quick Fix:</strong> 
-                Open the <code>.env</code> file in your project folder and set your API key:
-                <br>
-                <code>GEMINI_API_KEY=AIzaSy...your_real_key_here</code>
-            </div>
-        {% else %}
-            <div style="background-color: #E8F5E9; border: 1px solid #C8E6C9; padding: 14px 18px; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 20px; color: var(--primary-green-dark);">
-                💡 <strong>Tip:</strong> High traffic spikes are temporary and usually resolve in seconds. Click the button below to retry!
-            </div>
-        {% endif %}
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            {% if ingredients_input %}
-                <form action="{{ url_for('generate') }}" method="POST" style="display: inline;">
-                    <input type="hidden" name="ingredients" value="{{ ingredients_input }}">
-                    <input type="hidden" name="category" value="{{ category }}">
-                    <input type="hidden" name="language" value="{{ language }}">
-                    <button type="submit" class="btn btn-primary">🔄 Try Generating Again</button>
-                </form>
-            {% endif %}
-            <a href="{{ url_for('index') }}" class="btn btn-outline">Return to Home</a>
-        </div>
-    </div>
-{% endif %}
-
-<!-- Recipe Cards Grid -->
+<!-- Recipe Cards Grid (Dynamic from SQLite Database) -->
 {% if recipes and recipes|length > 0 %}
-    <div class="recipes-grid">
+    <div class="recipes-grid" id="recipes-grid">
         {% for recipe in recipes %}
-            <div class="recipe-card">
+            <div class="recipe-card" id="recipe-card-{{ recipe.id }}">
                 <div>
                     <!-- Header Badges -->
                     <div class="card-header-badges">
-                        <span class="category-tag">{{ recipe.category or 'Home Style' }}</span>
-                        <span class="difficulty-tag">⚡ {{ recipe.difficulty or 'Easy' }}</span>
+                        <span class="category-tag">
+                            <i class="fa-solid fa-tag"></i> <span id="card-cat-{{ recipe.id }}">{{ recipe.category or 'Everyday Meal' }}</span>
+                        </span>
+                        <span class="difficulty-tag">
+                            <i class="fa-solid fa-gauge-high"></i> <span id="card-diff-{{ recipe.id }}">{{ recipe.difficulty or 'Easy' }}</span>
+                        </span>
                     </div>
 
                     <!-- Recipe Title -->
-                    <h2 class="recipe-title">{{ recipe.title }}</h2>
+                    <h2 class="recipe-title" id="card-title-{{ recipe.id }}">{{ recipe.title }}</h2>
 
                     <!-- Short Description -->
-                    <p class="recipe-desc">{{ recipe.description }}</p>
+                    <p class="recipe-desc" id="card-desc-{{ recipe.id }}">{{ recipe.description or 'Custom culinary creation.' }}</p>
 
                     <!-- Recipe Stats Bar -->
                     <div class="recipe-stats-row">
                         <div class="stat-item" title="Prep Time">
-                            ⏱️ <span>{{ recipe.prep_time }}</span>
+                            <i class="fa-regular fa-clock text-primary"></i>
+                            <span id="card-prep-{{ recipe.id }}">{{ recipe.prep_time or '15 mins' }}</span>
                         </div>
                         <div class="stat-item" title="Cook Time">
-                            🍳 <span>{{ recipe.cook_time }}</span>
+                            <i class="fa-solid fa-fire text-coral"></i>
+                            <span id="card-cook-{{ recipe.id }}">{{ recipe.cook_time or '20 mins' }}</span>
                         </div>
-                        <div class="stat-item" title="Calories">
-                            🥗 <span>{{ recipe.calories }}</span>
+                        <div class="stat-item" title="Estimated Calories">
+                            <i class="fa-solid fa-bolt text-accent"></i>
+                            <span id="card-cal-{{ recipe.id }}">{{ recipe.calories or '320 kcal' }}</span>
                         </div>
                     </div>
 
                     <!-- Ingredients Preview -->
-                    <div style="margin-bottom: 15px;">
-                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Key Ingredients:</span>
-                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px;">
+                    <div style="margin-bottom: 18px;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
+                            <i class="fa-solid fa-basket-shopping"></i> Key Ingredients:
+                        </span>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; line-height: 1.5;" id="card-ing-{{ recipe.id }}">
                             {% if recipe.ingredients is iterable and recipe.ingredients is not string %}
-                                {{ recipe.ingredients[:3]|join(", ") }}{% if recipe.ingredients|length > 3 %} and more...{% endif %}
+                                {{ recipe.ingredients[:3]|join(", ") }}{% if recipe.ingredients|length > 3 %}, +{{ recipe.ingredients|length - 3 }} more{% endif %}
                             {% else %}
                                 {{ recipe.ingredients }}
                             {% endif %}
@@ -99,41 +78,495 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="card-actions">
-                    <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn btn-primary">
-                        📖 View Steps
-                    </a>
-                    <button 
-                        class="btn btn-outline btn-save-fav" 
-                        data-id="{{ recipe.id }}"
-                        title="Save this recipe to SQLite favourites"
-                    >
-                        ❤️ Save
-                    </button>
+                <!-- Action Buttons: Full CRUD -->
+                <div class="card-actions-crud">
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                        <a href="{{ url_for('recipe_details', recipe_id=recipe.id) }}" class="btn btn-primary btn-sm" style="flex: 1; justify-content: center;">
+                            View Steps <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <button 
+                            type="button"
+                            class="btn btn-outline btn-sm btn-save-fav" 
+                            data-id="{{ recipe.id }}"
+                            title="Save to favourites"
+                        >
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                        <button 
+                            type="button" 
+                            class="btn btn-outline btn-sm btn-edit-recipe" 
+                            data-id="{{ recipe.id }}"
+                            style="flex: 1; justify-content: center;"
+                            title="Edit this recipe (CRUD - Update)"
+                        >
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                        <button 
+                            type="button" 
+                            class="btn btn-outline-danger btn-sm btn-delete-recipe" 
+                            data-id="{{ recipe.id }}"
+                            data-title="{{ recipe.title }}"
+                            style="flex: 1; justify-content: center;"
+                            title="Delete this recipe (CRUD - Delete)"
+                        >
+                            <i class="fa-solid fa-trash-can"></i> Delete
+                        </button>
+                    </div>
                 </div>
             </div>
         {% endfor %}
     </div>
 
-    <!-- Chef Chatbot Promotion Banner -->
-    <div class="generator-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; background-color: var(--primary-green-light); border-color: var(--primary-green-border);">
-        <div>
-            <h3 style="color: var(--primary-green-dark); margin-bottom: 4px;">👨‍🍳 Have cooking questions about these recipes?</h3>
-            <p style="color: var(--text-secondary); font-size: 0.95rem;">Ask Chef AI for ingredient substitutions, tips to improve taste, or quick cooking tricks!</p>
+    <!-- Chef Chatbot Helper Card -->
+    <div class="generator-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; background: linear-gradient(135deg, var(--primary-light) 0%, #F0FDF4 100%); border-color: var(--primary-border); margin-top: 32px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="feature-icon-bubble bg-emerald" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <div>
+                <h3 style="color: var(--primary-hover); font-size: 1.25rem; font-weight: 800; margin-bottom: 4px;">Need customized adjustments?</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Ask Chef AI for ingredient substitutions, taste tweaks, or cooking tips!</p>
+            </div>
         </div>
-        <a href="{{ url_for('chatbot') }}" class="btn btn-accent">Ask Chef AI Now &rarr;</a>
+        <a href="{{ url_for('chatbot') }}" class="btn btn-accent">
+            <i class="fa-solid fa-comments"></i> Ask Chef AI
+        </a>
     </div>
 
-{% elif not error_message %}
+{% else %}
     <!-- Empty State -->
-    <div class="generator-card" style="text-align: center; padding: 50px 20px; margin-top: 20px;">
-        <span style="font-size: 3rem;">🥣</span>
-        <h2 style="color: var(--primary-green); margin: 15px 0 10px;">No Recipes Generated Yet</h2>
-        <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 25px;">
-            Head over to the home page, enter whatever ingredients you have in your kitchen, and let AI create 3 custom dishes!
+    <div class="generator-card" style="text-align: center; padding: 60px 24px; margin-top: 20px;">
+        <div class="empty-icon-wrap">
+            <i class="fa-solid fa-kitchen-set"></i>
+        </div>
+        <h2 style="font-size: 1.7rem; font-weight: 800; color: var(--text-primary); margin: 18px 0 10px;">No Recipes Found</h2>
+        <p style="color: var(--text-muted); max-width: 520px; margin: 0 auto 28px; font-size: 1.05rem;">
+            Your recipe collection is empty. You can formulate custom dishes with Chef AI, or create your own custom recipe right now!
         </p>
-        <a href="{{ url_for('index') }}" class="btn btn-primary">🍲 Enter Ingredients Now</a>
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" id="empty-add-btn">
+                <i class="fa-solid fa-plus"></i> Add Custom Recipe
+            </button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate with AI
+            </a>
+        </div>
     </div>
 {% endif %}
+
+
+<!-- ======================================================================= -->
+<!-- Modal 1: Create Recipe (CRUD - Create)                                  -->
+<!-- ======================================================================= -->
+<div class="modal-overlay" id="modal-create-recipe" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 560px;">
+        <div class="modal-header">
+            <h2 class="modal-title"><i class="fa-solid fa-plus text-primary"></i> Add Custom Recipe</h2>
+            <button type="button" class="modal-close-btn" id="close-create-modal">&times;</button>
+        </div>
+
+        <form id="form-create-recipe">
+            <!-- Title -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-heading text-primary"></i> Recipe Title *</label>
+                <input type="text" id="create-title" class="input-box" placeholder="e.g. Grandma's Special Vegetable Pulao" required>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-align-left text-primary"></i> Short Description</label>
+                <input type="text" id="create-desc" class="input-box" placeholder="Brief 1-line description of the dish">
+            </div>
+
+            <!-- Category & Difficulty Row -->
+            <div class="form-options-row" style="margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-solid fa-tag text-primary"></i> Category</label>
+                    <div class="select-wrapper">
+                        <select id="create-category" class="select-box">
+                            <option value="Vegetarian" selected>Vegetarian (शाकाहारी)</option>
+                            <option value="Non-Vegetarian">Non-Vegetarian (मांसाहारी)</option>
+                            <option value="Breakfast">Breakfast (नाश्ता)</option>
+                            <option value="Lunch">Lunch (दुपारचे जेवण)</option>
+                            <option value="Dinner">Dinner (रात्रीचे जेवण)</option>
+                            <option value="Snacks">Snacks (चटपटा नाश्ता)</option>
+                            <option value="Dessert">Dessert (मिष्टान्न)</option>
+                            <option value="Vegan">Vegan (पूर्ण शाकाहारी)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-solid fa-gauge-high text-primary"></i> Difficulty</label>
+                    <div class="select-wrapper">
+                        <select id="create-difficulty" class="select-box">
+                            <option value="Easy" selected>Easy (सोपे)</option>
+                            <option value="Medium">Medium (मध्यम)</option>
+                            <option value="Hard">Hard (कठीण)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Times & Calories Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-regular fa-clock"></i> Prep Time</label>
+                    <input type="text" id="create-prep" class="input-box" placeholder="10 mins" value="10 mins">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-solid fa-fire text-coral"></i> Cook Time</label>
+                    <input type="text" id="create-cook" class="input-box" placeholder="20 mins" value="20 mins">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-solid fa-bolt text-accent"></i> Calories</label>
+                    <input type="text" id="create-calories" class="input-box" placeholder="300 kcal" value="300 kcal">
+                </div>
+            </div>
+
+            <!-- Ingredients Textarea -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fa-solid fa-carrot text-primary"></i> Ingredients <span class="hint">(One per line)</span> *
+                </label>
+                <textarea id="create-ingredients" class="input-box" rows="4" placeholder="1 cup Rice&#10;2 medium Tomatoes, chopped&#10;1 Onion, sliced&#10;1/2 tsp Cumin seeds&#10;Salt to taste" required></textarea>
+            </div>
+
+            <!-- Instructions Textarea -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fa-solid fa-list-ol text-primary"></i> Step-by-Step Instructions <span class="hint">(One step per line)</span> *
+                </label>
+                <textarea id="create-instructions" class="input-box" rows="4" placeholder="Step 1: Heat oil in a pan and add cumin seeds.&#10;Step 2: Sauté onions until golden.&#10;Step 3: Add chopped tomatoes and spices.&#10;Step 4: Mix in rice and simmer until cooked." required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-outline" id="cancel-create-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submit-create-btn">
+                    <i class="fa-solid fa-check"></i> Save Recipe to Database
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- ======================================================================= -->
+<!-- Modal 2: Edit Recipe (CRUD - Update)                                    -->
+<!-- ======================================================================= -->
+<div class="modal-overlay" id="modal-edit-recipe" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 560px;">
+        <div class="modal-header">
+            <h2 class="modal-title"><i class="fa-solid fa-pen-to-square text-primary"></i> Edit Recipe</h2>
+            <button type="button" class="modal-close-btn" id="close-edit-modal">&times;</button>
+        </div>
+
+        <form id="form-edit-recipe">
+            <input type="hidden" id="edit-recipe-id">
+
+            <!-- Title -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-heading text-primary"></i> Recipe Title *</label>
+                <input type="text" id="edit-title" class="input-box" required>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-align-left text-primary"></i> Short Description</label>
+                <input type="text" id="edit-desc" class="input-box">
+            </div>
+
+            <!-- Category & Difficulty Row -->
+            <div class="form-options-row" style="margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-solid fa-tag text-primary"></i> Category</label>
+                    <div class="select-wrapper">
+                        <select id="edit-category" class="select-box">
+                            <option value="Vegetarian">Vegetarian (शाकाहारी)</option>
+                            <option value="Non-Vegetarian">Non-Vegetarian (मांसाहारी)</option>
+                            <option value="Breakfast">Breakfast (नाश्ता)</option>
+                            <option value="Lunch">Lunch (दुपारचे जेवण)</option>
+                            <option value="Dinner">Dinner (रात्रीचे जेवण)</option>
+                            <option value="Snacks">Snacks (चटपटा नाश्ता)</option>
+                            <option value="Dessert">Dessert (मिष्टान्न)</option>
+                            <option value="Vegan">Vegan (पूर्ण शाकाहारी)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-solid fa-gauge-high text-primary"></i> Difficulty</label>
+                    <div class="select-wrapper">
+                        <select id="edit-difficulty" class="select-box">
+                            <option value="Easy">Easy (सोपे)</option>
+                            <option value="Medium">Medium (मध्यम)</option>
+                            <option value="Hard">Hard (कठीण)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Times & Calories Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-regular fa-clock"></i> Prep Time</label>
+                    <input type="text" id="edit-prep" class="input-box">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-solid fa-fire text-coral"></i> Cook Time</label>
+                    <input type="text" id="edit-cook" class="input-box">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label"><i class="fa-solid fa-bolt text-accent"></i> Calories</label>
+                    <input type="text" id="edit-calories" class="input-box">
+                </div>
+            </div>
+
+            <!-- Ingredients Textarea -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-carrot text-primary"></i> Ingredients <span class="hint">(One per line)</span> *</label>
+                <textarea id="edit-ingredients" class="input-box" rows="4" required></textarea>
+            </div>
+
+            <!-- Instructions Textarea -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-list-ol text-primary"></i> Instructions <span class="hint">(One step per line)</span> *</label>
+                <textarea id="edit-instructions" class="input-box" rows="4" required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-outline" id="cancel-edit-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submit-edit-btn">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Changes (Update)
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // --------------------------------------------------------------------------
+    // 1. Modal Controls: Create Recipe
+    // --------------------------------------------------------------------------
+    const modalCreate = document.getElementById("modal-create-recipe");
+    const btnOpenCreate = document.getElementById("btn-open-create-modal");
+    const emptyAddBtn = document.getElementById("empty-add-btn");
+    const btnCloseCreate = document.getElementById("close-create-modal");
+    const btnCancelCreate = document.getElementById("cancel-create-btn");
+    const formCreate = document.getElementById("form-create-recipe");
+
+    function openCreateModal() {
+        if (modalCreate) modalCreate.classList.add("open");
+    }
+    function closeCreateModal() {
+        if (modalCreate) modalCreate.classList.remove("open");
+    }
+
+    if (btnOpenCreate) btnOpenCreate.addEventListener("click", openCreateModal);
+    if (emptyAddBtn) emptyAddBtn.addEventListener("click", openCreateModal);
+    if (btnCloseCreate) btnCloseCreate.addEventListener("click", closeCreateModal);
+    if (btnCancelCreate) btnCancelCreate.addEventListener("click", closeCreateModal);
+
+    // --------------------------------------------------------------------------
+    // 2. Modal Controls: Edit Recipe
+    // --------------------------------------------------------------------------
+    const modalEdit = document.getElementById("modal-edit-recipe");
+    const btnCloseEdit = document.getElementById("close-edit-modal");
+    const btnCancelEdit = document.getElementById("cancel-edit-btn");
+    const formEdit = document.getElementById("form-edit-recipe");
+
+    function closeEditModal() {
+        if (modalEdit) modalEdit.classList.remove("open");
+    }
+
+    if (btnCloseEdit) btnCloseEdit.addEventListener("click", closeEditModal);
+    if (btnCancelEdit) btnCancelEdit.addEventListener("click", closeEditModal);
+
+    // Close on backdrop click
+    [modalCreate, modalEdit].forEach(function (m) {
+        if (m) {
+            m.addEventListener("click", function (e) {
+                if (e.target === m) m.classList.remove("open");
+            });
+        }
+    });
+
+    // --------------------------------------------------------------------------
+    // 3. CRUD - CREATE: Submit New Custom Recipe
+    // --------------------------------------------------------------------------
+    if (formCreate) {
+        formCreate.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById("submit-create-btn");
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+            const payload = {
+                title: document.getElementById("create-title").value.trim(),
+                description: document.getElementById("create-desc").value.trim(),
+                category: document.getElementById("create-category").value,
+                difficulty: document.getElementById("create-difficulty").value,
+                prep_time: document.getElementById("create-prep").value.trim(),
+                cook_time: document.getElementById("create-cook").value.trim(),
+                calories: document.getElementById("create-calories").value.trim(),
+                ingredients: document.getElementById("create-ingredients").value.trim(),
+                instructions: document.getElementById("create-instructions").value.trim()
+            };
+
+            fetch("/api/recipes/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Recipe to Database';
+                if (data.success) {
+                    closeCreateModal();
+                    // Reload to show new database entry
+                    window.location.reload();
+                } else {
+                    alert(data.message || "Failed to create recipe.");
+                }
+            })
+            .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Recipe to Database';
+                alert("Network error creating recipe.");
+            });
+        });
+    }
+
+    // --------------------------------------------------------------------------
+    // 4. CRUD - UPDATE: Open Edit Modal & Save Changes
+    // --------------------------------------------------------------------------
+    document.querySelectorAll(".btn-edit-recipe").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const recipeId = this.getAttribute("data-id");
+            fetch("/api/recipes/" + recipeId)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.recipe) {
+                        const r = data.recipe;
+                        document.getElementById("edit-recipe-id").value = r.id;
+                        document.getElementById("edit-title").value = r.title || "";
+                        document.getElementById("edit-desc").value = r.description || "";
+                        document.getElementById("edit-category").value = r.category || "Everyday Meal";
+                        document.getElementById("edit-difficulty").value = r.difficulty || "Easy";
+                        document.getElementById("edit-prep").value = r.prep_time || "10 mins";
+                        document.getElementById("edit-cook").value = r.cook_time || "20 mins";
+                        document.getElementById("edit-calories").value = r.calories || "300 kcal";
+
+                        const ingText = Array.isArray(r.ingredients) ? r.ingredients.join("\n") : (r.ingredients || "");
+                        const insText = Array.isArray(r.instructions) ? r.instructions.join("\n") : (r.instructions || "");
+                        document.getElementById("edit-ingredients").value = ingText;
+                        document.getElementById("edit-instructions").value = insText;
+
+                        modalEdit.classList.add("open");
+                    } else {
+                        alert(data.message || "Failed to fetch recipe details.");
+                    }
+                })
+                .catch(() => alert("Network error loading recipe."));
+        });
+    });
+
+    if (formEdit) {
+        formEdit.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const recipeId = document.getElementById("edit-recipe-id").value;
+            const submitBtn = document.getElementById("submit-edit-btn");
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+
+            const payload = {
+                title: document.getElementById("edit-title").value.trim(),
+                description: document.getElementById("edit-desc").value.trim(),
+                category: document.getElementById("edit-category").value,
+                difficulty: document.getElementById("edit-difficulty").value,
+                prep_time: document.getElementById("edit-prep").value.trim(),
+                cook_time: document.getElementById("edit-cook").value.trim(),
+                calories: document.getElementById("edit-calories").value.trim(),
+                ingredients: document.getElementById("edit-ingredients").value.trim(),
+                instructions: document.getElementById("edit-instructions").value.trim()
+            };
+
+            fetch("/api/recipes/update/" + recipeId, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes (Update)';
+                if (data.success) {
+                    closeEditModal();
+                    // Update DOM card in place
+                    const titleEl = document.getElementById("card-title-" + recipeId);
+                    const descEl = document.getElementById("card-desc-" + recipeId);
+                    const catEl = document.getElementById("card-cat-" + recipeId);
+                    const diffEl = document.getElementById("card-diff-" + recipeId);
+                    const prepEl = document.getElementById("card-prep-" + recipeId);
+                    const cookEl = document.getElementById("card-cook-" + recipeId);
+                    const calEl = document.getElementById("card-cal-" + recipeId);
+
+                    if (titleEl) titleEl.textContent = payload.title;
+                    if (descEl) descEl.textContent = payload.description;
+                    if (catEl) catEl.textContent = payload.category;
+                    if (diffEl) diffEl.textContent = payload.difficulty;
+                    if (prepEl) prepEl.textContent = payload.prep_time;
+                    if (cookEl) cookEl.textContent = payload.cook_time;
+                    if (calEl) calEl.textContent = payload.calories;
+                } else {
+                    alert(data.message || "Failed to update recipe.");
+                }
+            })
+            .catch(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes (Update)';
+                alert("Network error updating recipe.");
+            });
+        });
+    }
+
+    // --------------------------------------------------------------------------
+    // 5. CRUD - DELETE: Delete Recipe from SQLite Database
+    // --------------------------------------------------------------------------
+    document.querySelectorAll(".btn-delete-recipe").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const recipeId = this.getAttribute("data-id");
+            const recipeTitle = this.getAttribute("data-title") || "this recipe";
+
+            if (confirm(`Are you sure you want to delete "${recipeTitle}" from your database?`)) {
+                const card = document.getElementById("recipe-card-" + recipeId);
+
+                fetch("/api/recipes/delete/" + recipeId, {
+                    method: "POST"
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (card) {
+                            card.classList.add("deleting");
+                            setTimeout(() => card.remove(), 350);
+                        }
+                    } else {
+                        alert(data.message || "Failed to delete recipe.");
+                    }
+                })
+                .catch(() => alert("Network error deleting recipe."));
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

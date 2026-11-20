@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.name }}'s Profile - Mahilicious{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header Card -->
+    <div class="profile-hero-card">
+        <div class="profile-user-info">
+            {% if user.profile_picture %}
+                <img src="{{ user.profile_picture }}" alt="{{ user.name }}" class="profile-avatar-circle" style="object-fit: cover; border: 3px solid #ffffff; box-shadow: var(--shadow-md);">
+            {% else %}
+                <div class="profile-avatar-circle" style="background-color: {{ user.avatar_color or '#059669' }};">
+                    {{ user.name[0]|upper }}
+                </div>
+            {% endif %}
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <h1 class="profile-name">{{ user.name }}</h1>
+                    {% if user.google_id %}
+                        <span class="brand-tag" style="background: #eef2ff; color: #4338ca; border-color: #c7d2fe;">
+                            <i class="fa-brands fa-google"></i> Google
+                        </span>
+                    {% else %}
+                        <span class="brand-tag">Member</span>
+                    {% endif %}
+                </div>
+                <p class="profile-email">
+                    <i class="fa-solid fa-envelope"></i> {{ user.email }} &bull; 
+                    <i class="fa-regular fa-calendar-check"></i> Joined {{ stats.joined_at }}
+                </p>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{{ url_for('favourites') }}" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-heart"></i> My Favourites ({{ stats.total_saved }})
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">
+                <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="profile-stats-grid">
+        <div class="profile-stat-card">
+            <div class="stat-icon-wrap bg-emerald">
+                <i class="fa-solid fa-bookmark"></i>
+            </div>
+            <div class="stat-meta">
+                <span class="stat-number">{{ stats.total_saved }}</span>
+                <span class="stat-label">Saved Favourites</span>
+            </div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="stat-icon-wrap bg-amber">
+                <i class="fa-solid fa-plate-wheat"></i>
+            </div>
+            <div class="stat-meta">
+                <span class="stat-number">{{ stats.top_category }}</span>
+                <span class="stat-label">Top Category</span>
+            </div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="stat-icon-wrap bg-teal">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="stat-meta">
+                <span class="stat-number">Gemini 3.8</span>
+                <span class="stat-label">AI Engine</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Saved Recipes Section -->
+    <div class="info-section" style="margin-top: 36px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary);">
+                <i class="fa-solid fa-heart text-coral"></i> Your Recent Favourites
+            </h2>
+            {% if stats.total_saved > 0 %}
+                <a href="{{ url_for('favourites') }}" class="btn btn-outline btn-sm">
+                    View All ({{ stats.total_saved }}) &rarr;
+                </a>
+            {% endif %}
+        </div>
+
+        {% if recent_favs and recent_favs|length > 0 %}
+            <div class="recipes-grid">
+                {% for fav in recent_favs %}
+                    <div class="recipe-card">
+                        <div>
+                            <div class="card-header-badges">
+                                <span class="category-tag"><i class="fa-solid fa-tag"></i> {{ fav.category or 'General' }}</span>
+                                <span class="difficulty-tag"><i class="fa-solid fa-gauge-high"></i> {{ fav.difficulty or 'Easy' }}</span>
+                            </div>
+                            <h3 class="recipe-title" style="font-size: 1.2rem;">{{ fav.title }}</h3>
+                            <p class="recipe-desc">{{ fav.description }}</p>
+                        </div>
+                        <div class="card-actions">
+                            <a href="{{ url_for('recipe_details', recipe_id=fav.id) }}" class="btn btn-primary btn-sm">
+                                View Recipe &rarr;
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="generator-card" style="text-align: center; padding: 40px 20px;">
+                <div class="empty-icon-wrap" style="width: 56px; height: 56px; font-size: 1.5rem;">
+                    <i class="fa-regular fa-heart text-coral"></i>
+                </div>
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">No Favourites Yet</h3>
+                <p style="color: var(--text-muted); max-width: 460px; margin: 0 auto 20px; font-size: 0.95rem;">
+                    Head to the generator, enter your kitchen ingredients, and click "Save" on any recipe you love!
+                </p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Recipes Now
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

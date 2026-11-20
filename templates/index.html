@@ -1,128 +1,236 @@
 {% extends "base.html" %}
 
-{% block title %}Home - AI Food Recipe Generator{% endblock %}
+{% block title %}Mahilicious - AI Food Recipe Generator{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
+<!-- Modern Hero Section -->
 <section class="hero">
-    <span class="hero-tag">✨ Instant Home Recipes</span>
-    <h1>AI Food Recipe Generator</h1>
+    <div class="hero-tag">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Mahilicious Culinary Intelligence
+    </div>
+    <h1>
+        Transform Your Ingredients Into <br>
+        <span class="text-highlight">Mahilicious Creations</span>
+    </h1>
     <p>
-        Got random ingredients in your kitchen? Enter them below and let AI generate 
-        3 delicious, step-by-step recipes customized to your taste, category, and preferred language!
+        Got random items in your fridge or pantry? Enter them below and let Chef AI formulate 
+        3 step-by-step recipes customized to your dietary preferences and preferred language in seconds.
     </p>
+
+    <!-- Hero Feature Badges with Professional Icons -->
+    <div class="hero-badges-row">
+        <span class="hero-feature-chip">
+            <i class="fa-solid fa-bolt text-accent"></i> 3 Recipes Per Prompt
+        </span>
+        <span class="hero-feature-chip">
+            <i class="fa-solid fa-chart-pie text-primary"></i> Calorie & Macro Breakdown
+        </span>
+        <span class="hero-feature-chip">
+            <i class="fa-solid fa-earth-americas text-primary"></i> English, हिन्दी & मराठी
+        </span>
+        <span class="hero-feature-chip">
+            <i class="fa-solid fa-cart-shopping text-accent"></i> 1-Click Shopping List
+        </span>
+    </div>
 </section>
 
 <!-- Main Recipe Generator Form Card -->
 <section class="generator-card">
+    {% if not current_user %}
+    <!-- Guest Auth Gate Banner -->
+    <div class="auth-gate-banner">
+        <div class="auth-gate-text">
+            <div class="auth-gate-icon">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+                <h4>Sign In Required to Generate Recipes</h4>
+                <p>Create a free account or sign in to formulate custom AI recipes from your kitchen ingredients.</p>
+            </div>
+        </div>
+        <div class="auth-gate-actions">
+            <a href="{{ url_for('login', next=url_for('index')) }}" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+            </a>
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-user-plus"></i> Sign Up Free
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     <form id="generate-recipe-form" action="{{ url_for('generate') }}" method="POST">
         <!-- Ingredient Input Field -->
         <div class="form-group">
             <label for="ingredients-input" class="form-label">
-                🥗 Enter Available Ingredients:
-                <span class="hint">(Separate items with commas, e.g. Potato, Onion, Tomato)</span>
+                <i class="fa-solid fa-carrot text-primary"></i> Enter Available Ingredients:
+                <span class="hint">(Separate with commas, e.g. Potato, Onion, Tomato)</span>
             </label>
-            <input 
-                type="text" 
-                id="ingredients-input" 
-                name="ingredients" 
-                class="input-box" 
-                placeholder="e.g. Potato, Onion, Tomato, Rice, Paneer, Garlic..."
-                required
-                autocomplete="off"
-            >
             
-            <!-- Quick Suggestion Chips for Presentation / Demo -->
+            <div class="input-wrapper">
+                <span class="input-icon-left">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input 
+                    type="text" 
+                    id="ingredients-input" 
+                    name="ingredients" 
+                    class="input-box" 
+                    placeholder="e.g. Potato, Onion, Tomato, Rice, Paneer, Garlic..."
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            
+            <!-- Quick Suggestion Chips with Vector Icons -->
             <div class="quick-chips-wrapper">
-                <span class="chips-label">Quick Add:</span>
-                <button type="button" class="chip-btn" data-ingredient="Potato">🥔 Potato</button>
-                <button type="button" class="chip-btn" data-ingredient="Onion">🧅 Onion</button>
-                <button type="button" class="chip-btn" data-ingredient="Tomato">🍅 Tomato</button>
-                <button type="button" class="chip-btn" data-ingredient="Rice">🍚 Rice</button>
-                <button type="button" class="chip-btn" data-ingredient="Paneer">🧀 Paneer</button>
-                <button type="button" class="chip-btn" data-ingredient="Garlic">🧄 Garlic</button>
-                <button type="button" class="chip-btn" data-ingredient="Spinach">🥬 Spinach</button>
-                <button type="button" class="chip-btn" data-ingredient="Egg">🥚 Egg</button>
-                <button type="button" class="chip-btn" data-ingredient="Chicken">🍗 Chicken</button>
+                <span class="chips-label"><i class="fa-solid fa-plus"></i> Quick Add:</span>
+                <button type="button" class="chip-btn" data-ingredient="Potato">
+                    <i class="fa-solid fa-circle-dot"></i> Potato
+                </button>
+                <button type="button" class="chip-btn" data-ingredient="Onion">
+                    <i class="fa-solid fa-fan"></i> Onion
+                </button>
+                <button type="button" class="chip-btn" data-ingredient="Tomato">
+                    <i class="fa-solid fa-circle text-coral"></i> Tomato
+                </button>
+                <button type="button" class="chip-btn" data-ingredient="Rice">
+                    <i class="fa-solid fa-bowl-rice text-accent"></i> Rice
+                </button>
+                <button type="button" class="chip-btn" data-ingredient="Paneer">
+                    <i class="fa-solid fa-cheese text-accent"></i> Paneer
+                </button>
+                <button type="button" class="chip-btn" data-ingredient="Garlic">
+                    <i class="fa-solid fa-seedling text-primary"></i> Garlic
+                </button>
+                <button type="button" class="chip-btn" data-ingredient="Spinach">
+                    <i class="fa-solid fa-leaf text-primary"></i> Spinach
+                </button>
+                <button type="button" class="chip-btn" data-ingredient="Egg">
+                    <i class="fa-solid fa-egg text-accent"></i> Egg
+                </button>
+                <button type="button" class="chip-btn" data-ingredient="Chicken">
+                    <i class="fa-solid fa-drumstick-bite text-coral"></i> Chicken
+                </button>
             </div>
         </div>
 
         <!-- Options: Category & Language -->
         <div class="form-options-row">
-            <div class="form-group">
-                <label for="category-select" class="form-label">🍽️ Recipe Category / Diet:</label>
-                <select id="category-select" name="category" class="select-box">
-                    <option value="All">All Categories</option>
-                    <option value="Breakfast">Breakfast (नाश्ता)</option>
-                    <option value="Lunch">Lunch (दुपारचे जेवण / दोपहर का खाना)</option>
-                    <option value="Dinner">Dinner (रात्रीचे जेवण / रात का खाना)</option>
-                    <option value="Snacks">Snacks (चटपटा नाश्ता)</option>
-                    <option value="Vegetarian" selected>Vegetarian (शाकाहारी)</option>
-                    <option value="Non-Vegetarian">Non-Vegetarian (मांसाहारी)</option>
-                    <option value="Vegan">Vegan (पूर्ण शाकाहारी)</option>
-                </select>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="category-select" class="form-label">
+                    <i class="fa-solid fa-plate-wheat text-primary"></i> Recipe Category / Diet:
+                </label>
+                <div class="select-wrapper">
+                    <select id="category-select" name="category" class="select-box">
+                        <option value="All">All Categories</option>
+                        <option value="Breakfast">Breakfast (नाश्ता)</option>
+                        <option value="Lunch">Lunch (दुपारचे जेवण / दोपहर का खाना)</option>
+                        <option value="Dinner">Dinner (रात्रीचे जेवण / रात का खाना)</option>
+                        <option value="Snacks">Snacks (चटपटा नाश्ता)</option>
+                        <option value="Vegetarian" selected>Vegetarian (शाकाहारी)</option>
+                        <option value="Non-Vegetarian">Non-Vegetarian (मांसाहारी)</option>
+                        <option value="Vegan">Vegan (पूर्ण शाकाहारी)</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="language-select" class="form-label">🌐 Output Language:</label>
-                <select id="language-select" name="language" class="select-box">
-                    <option value="en" selected>English</option>
-                    <option value="hi">हिन्दी (Hindi)</option>
-                    <option value="mr">मराठी (Marathi)</option>
-                </select>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="language-select" class="form-label">
+                    <i class="fa-solid fa-globe text-primary"></i> Output Language:
+                </label>
+                <div class="select-wrapper">
+                    <select id="language-select" name="language" class="select-box">
+                        <option value="en" selected>English</option>
+                        <option value="hi">हिन्दी (Hindi)</option>
+                        <option value="mr">मराठी (Marathi)</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <!-- Generate Button -->
-        <button type="submit" id="generate-btn" class="btn btn-primary btn-block">
-            ✨ Generate 3 AI Recipes
-        </button>
+        <!-- High-Impact CTA Button -->
+        {% if current_user %}
+            <button type="submit" id="generate-btn" class="btn btn-primary btn-block">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate 3 AI Recipes
+            </button>
+        {% else %}
+            <a href="{{ url_for('login', next=url_for('index')) }}" id="guest-generate-btn" class="btn btn-primary btn-block" style="text-decoration: none; justify-content: center;">
+                <i class="fa-solid fa-lock"></i> Sign In to Generate 3 AI Recipes
+            </a>
+        {% endif %}
     </form>
 </section>
 
-<!-- Simple Instructions: How to Use the Website -->
+<!-- How to Use the Generator -->
 <section class="info-section">
-    <h2 class="section-title-center">📌 How to Use This Website</h2>
+    <h2 class="section-title-center">How It Works</h2>
     <div class="steps-grid">
         <div class="step-card">
-            <div class="step-number">1</div>
-            <h3>Enter Ingredients</h3>
-            <p>Type the ingredients you already have at home or click the quick-add chips above.</p>
+            <div class="step-icon-wrap">
+                <i class="fa-solid fa-basket-shopping"></i>
+            </div>
+            <h3>1. Enter Ingredients</h3>
+            <p>List the ingredients sitting in your fridge or pantry, or simply tap the quick-add chips above.</p>
         </div>
         <div class="step-card">
-            <div class="step-number">2</div>
-            <h3>Select Category & Language</h3>
-            <p>Choose whether you want Breakfast, Dinner, Vegan, etc., and pick English, Hindi, or Marathi.</p>
+            <div class="step-icon-wrap">
+                <i class="fa-solid fa-sliders"></i>
+            </div>
+            <h3>2. Pick Category & Language</h3>
+            <p>Filter by meal type (Breakfast, Dinner, Vegan, etc.) and your preferred language: English, Hindi, or Marathi.</p>
         </div>
         <div class="step-card">
-            <div class="step-number">3</div>
-            <h3>Get Recipes & Save</h3>
-            <p>Get 3 customized recipes with cook time, steps, calories, and save to your favourites.</p>
+            <div class="step-icon-wrap">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3>3. Cook & Save Favourites</h3>
+            <p>Get 3 customized recipes with cook time, calorie breakdown, step-by-step directions, and 1-click SQLite saving.</p>
         </div>
     </div>
 </section>
 
-<!-- Key Project Highlights -->
-<section class="info-section" style="margin-top: 20px;">
-    <h2 class="section-title-center">🌟 Key Features</h2>
+<!-- Key Platform Features -->
+<section class="info-section">
+    <h2 class="section-title-center">Explore Chef AI Features</h2>
     <div class="steps-grid">
-        <div class="step-card" style="text-align: left;">
-            <h3 style="color: var(--primary-green);">👨‍🍳 Chef AI Chatbot</h3>
-            <p>Ask cooking questions like <em>"What can I cook with potatoes?"</em> or <em>"What can I substitute for tomato?"</em></p>
-            <div style="margin-top: 10px;">
-                <a href="{{ url_for('chatbot') }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 0.85rem;">Try Chatbot &rarr;</a>
+        <div class="step-card">
+            <div class="feature-icon-bubble bg-emerald">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <h3>Chef AI Chatbot</h3>
+            <p>Have cooking questions? Ask Chef AI for ingredient substitutes, cooking techniques, and instant tips.</p>
+            <div style="margin-top: 16px;">
+                <a href="{{ url_for('chatbot') }}" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.88rem;">
+                    <i class="fa-solid fa-comments"></i> Open Chatbot
+                </a>
             </div>
         </div>
-        <div class="step-card" style="text-align: left;">
-            <h3 style="color: var(--accent-orange);">❤️ Persistent Favourites</h3>
-            <p>Save recipes to an embedded SQLite database that persists even after closing or restarting the server.</p>
-            <div style="margin-top: 10px;">
-                <a href="{{ url_for('favourites') }}" class="btn btn-outline" style="padding: 6px 14px; font-size: 0.85rem;">View Saved &rarr;</a>
+
+        <div class="step-card">
+            <div class="feature-icon-bubble bg-amber">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <h3>Persistent Favourites</h3>
+            <p>Save delicious generated recipes directly to your local SQLite database for instant offline access anytime.</p>
+            <div style="margin-top: 16px;">
+                <a href="{{ url_for('favourites') }}" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.88rem;">
+                    <i class="fa-solid fa-bookmark"></i> View Favourites
+                </a>
             </div>
         </div>
-        <div class="step-card" style="text-align: left;">
-            <h3 style="color: var(--primary-green);">🖨️ Clean Recipe Print</h3>
-            <p>Print any recipe directly to paper or save as PDF with clean, distraction-free styling.</p>
+
+        <div class="step-card">
+            <div class="feature-icon-bubble bg-teal">
+                <i class="fa-solid fa-print"></i>
+            </div>
+            <h3>Distraction-Free Print</h3>
+            <p>Print any recipe cleanly to paper or save as a PDF formatted specifically for kitchen countertops.</p>
+            <div style="margin-top: 16px;">
+                <a href="{{ url_for('recipes') }}" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.88rem;">
+                    <i class="fa-solid fa-book-open"></i> Browse Recipes
+                </a>
+            </div>
         </div>
     </div>
 </section>

@@ -1,13 +1,14 @@
 /**
  * ==============================================================================
- * AI Food Recipe Generator - Client Script
+ * AI Food Recipe Generator - Enhanced Client Script
  * ==============================================================================
  * Handles:
- * 1. Quick ingredient tag adding to input box
+ * 1. Quick ingredient tag adding to input box with selected visual state
  * 2. Form submission loading indicators
  * 3. Save / Remove Favourite recipes via AJAX
  * 4. Interactive Chef AI Chatbot (with quick prompt chips)
  * 5. Clean Recipe Print functionality
+ * 6. API Key Setup Modal
  */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -15,7 +16,38 @@ document.addEventListener("DOMContentLoaded", function () {
     // 1. Quick Ingredient Chips (Home Page)
     // --------------------------------------------------------------------------
     const ingredientInput = document.getElementById("ingredients-input");
-    const quickChips = document.querySelectorAll(".chip-btn");
+    const quickChips = document.querySelectorAll(".chip-btn:not(.chat-chip-btn)");
+
+    // Restore pending ingredients saved before guest login
+    const pendingIngredients = sessionStorage.getItem("pending_ingredients");
+    if (pendingIngredients && ingredientInput && !ingredientInput.value) {
+        ingredientInput.value = pendingIngredients;
+        sessionStorage.removeItem("pending_ingredients");
+    }
+
+    const guestGenerateBtn = document.getElementById("guest-generate-btn");
+    if (guestGenerateBtn && ingredientInput) {
+        guestGenerateBtn.addEventListener("click", function () {
+            if (ingredientInput.value.trim()) {
+                sessionStorage.setItem("pending_ingredients", ingredientInput.value.trim());
+            }
+        });
+    }
+
+    function updateChipSelectionState() {
+        if (!ingredientInput) return;
+        const currentVal = ingredientInput.value.toLowerCase();
+        const currentItems = currentVal.split(",").map(s => s.trim());
+
+        quickChips.forEach(function (chip) {
+            const ingredient = (chip.getAttribute("data-ingredient") || "").toLowerCase();
+            if (ingredient && currentItems.includes(ingredient)) {
+                chip.classList.add("selected");
+            } else {
+                chip.classList.remove("selected");
+            }
+        });
+    }
 
     quickChips.forEach(function (chip) {
         chip.addEventListener("click", function () {
@@ -26,15 +58,20 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!currentVal) {
                 ingredientInput.value = ingredient;
             } else {
-                // Check if ingredient is already present (case-insensitive)
                 const items = currentVal.split(",").map(s => s.trim().toLowerCase());
                 if (!items.includes(ingredient.toLowerCase())) {
                     ingredientInput.value = currentVal + ", " + ingredient;
                 }
             }
+            updateChipSelectionState();
             ingredientInput.focus();
         });
     });
+
+    if (ingredientInput) {
+        ingredientInput.addEventListener("input", updateChipSelectionState);
+        updateChipSelectionState();
+    }
 
     // --------------------------------------------------------------------------
     // 2. Generate Recipe Form Loading State
@@ -46,9 +83,9 @@ document.addEventListener("DOMContentLoaded", function () {
         generateForm.addEventListener("submit", function () {
             const inputVal = ingredientInput ? ingredientInput.value.trim() : "";
             if (inputVal) {
-                generateBtn.disabled = true;
-                generateBtn.innerHTML = "🍳 Cooking Up Your Recipes...";
-                generateBtn.style.opacity = "0.85";
+                generateBtn.style.pointerEvents = "none";
+                generateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Formulating Your Recipes...';
+                generateBtn.style.opacity = "0.88";
                 generateBtn.style.cursor = "wait";
             }
         });
@@ -74,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    btn.innerHTML = "❤️ Saved to Favourites";
+                    btn.innerHTML = '<i class="fa-solid fa-heart"></i> Saved';
                     btn.classList.remove("btn-outline");
                     btn.classList.add("btn-accent");
                     btn.disabled = true;
@@ -120,24 +157,26 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    // Fade out and remove card from DOM
                     if (card) {
                         card.style.transition = "all 0.3s ease";
                         card.style.opacity = "0";
-                        card.style.transform = "scale(0.9)";
+                        card.style.transform = "scale(0.92)";
                         setTimeout(() => {
                             card.remove();
-                            // Check if no cards left
                             const remaining = document.querySelectorAll(".recipe-card");
                             if (remaining.length === 0) {
                                 const container = document.getElementById("favourites-container");
                                 if (container) {
                                     container.innerHTML = `
-                                        <div class="generator-card" style="text-align: center; padding: 40px;">
-                                            <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 15px;">
-                                                You have no saved favourite recipes yet.
+                                        <div class="generator-card" style="text-align: center; padding: 60px 24px;">
+                                            <div class="empty-icon-wrap">
+                                                <i class="fa-regular fa-heart text-coral"></i>
+                                            </div>
+                                            <h2 style="font-size: 1.7rem; font-weight: 800; color: var(--text-primary); margin: 18px 0 10px;">No Favourite Recipes Yet</h2>
+                                            <p style="color: var(--text-muted); max-width: 520px; margin: 0 auto 28px; font-size: 1.05rem;">
+                                                You have no saved recipes in your collection.
                                             </p>
-                                            <a href="/" class="btn btn-primary">🍲 Generate New Recipes</a>
+                                            <a href="/" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Generate New Recipes</a>
                                         </div>
                                     `;
                                 }
@@ -145,7 +184,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         }, 300);
                     }
 
-                    // Decrement navbar counter
                     const countBadge = document.getElementById("fav-count-badge");
                     if (countBadge) {
                         let currentCount = parseInt(countBadge.textContent) || 1;
@@ -190,7 +228,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const bubble = document.createElement("div");
         bubble.className = "message-bubble";
 
-        // Format: bold **text**, newlines → <br>, numbered & bullet lists
         let formatted = escapeHtml(text)
             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
             .replace(/\n(\d+)\.\s/g, '<br><strong>$1.</strong> ')
@@ -214,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <span class="typing-dots">
                 <span></span><span></span><span></span>
             </span>
-            <span style="font-size:0.82rem; color:var(--text-muted); margin-left:8px;">Chef AI is cooking up an answer...</span>
+            <span style="font-size:0.84rem; color:var(--text-muted); margin-left:8px;">Chef AI is formulating an answer...</span>
         `;
 
         row.appendChild(bubble);
@@ -247,7 +284,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 language: lang
             })
         })
-        .then(res => res.json())
+        .then(res => {
+            if (res.status === 401) {
+                const modal = document.getElementById("chat-auth-modal");
+                if (modal) modal.classList.add("open");
+            }
+            return res.json();
+        })
         .then(data => {
             removeTypingIndicator();
             if (data.reply) {
@@ -285,10 +328,107 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Simple HTML escaping helper for chat security
     function escapeHtml(text) {
         const div = document.createElement("div");
         div.textContent = text;
         return div.innerHTML;
     }
+
+    // --------------------------------------------------------------------------
+    // 7. API Key Setup Modal
+    // --------------------------------------------------------------------------
+    const apiModal = document.getElementById("api-key-modal");
+    const openModalBtn = document.getElementById("open-api-modal");
+    const bannerModalBtn = document.getElementById("banner-modal-trigger");
+    const closeModalBtn = document.getElementById("close-api-modal");
+    const closeModalActionBtn = document.getElementById("close-api-modal-btn");
+
+    function openModal() {
+        if (apiModal) apiModal.classList.add("open");
+    }
+
+    function closeModal() {
+        if (apiModal) apiModal.classList.remove("open");
+    }
+
+    if (openModalBtn) openModalBtn.addEventListener("click", openModal);
+    if (bannerModalBtn) bannerModalBtn.addEventListener("click", openModal);
+    if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
+    if (closeModalActionBtn) closeModalActionBtn.addEventListener("click", closeModal);
+
+    if (apiModal) {
+        apiModal.addEventListener("click", function (e) {
+            if (e.target === apiModal) {
+                closeModal();
+            }
+        });
+    }
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && apiModal && apiModal.classList.contains("open")) {
+            closeModal();
+        }
+    });
+
+    // --------------------------------------------------------------------------
+    // 8. Mobile Navigation Toggle
+    // --------------------------------------------------------------------------
+    const navToggle = document.getElementById("nav-toggle");
+    const navMenu = document.getElementById("nav-menu");
+
+    if (navToggle && navMenu) {
+        navToggle.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const isOpen = navMenu.classList.toggle("open");
+            navToggle.classList.toggle("open", isOpen);
+            navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        });
+
+        // Close mobile nav when clicking any nav link
+        navMenu.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                navMenu.classList.remove("open");
+                navToggle.classList.remove("open");
+                navToggle.setAttribute("aria-expanded", "false");
+            });
+        });
+
+        // Close when clicking outside
+        document.addEventListener("click", function (e) {
+            if (!navToggle.contains(e.target) && !navMenu.contains(e.target) && navMenu.classList.contains("open")) {
+                navMenu.classList.remove("open");
+                navToggle.classList.remove("open");
+                navToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        // Close on resize to desktop
+        window.addEventListener("resize", function () {
+            if (window.innerWidth > 768 && navMenu.classList.contains("open")) {
+                navMenu.classList.remove("open");
+                navToggle.classList.remove("open");
+                navToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+    }
 });
+
+// Global Password Visibility Toggle
+function togglePasswordVisibility(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    if (!input || !btn) return;
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (icon) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+}

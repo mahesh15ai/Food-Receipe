@@ -1,26 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}{{ recipe.title }} - Recipe Details{% endblock %}
+{% block title %}{{ recipe.title }} - Mahilicious{% endblock %}
 
 {% block content %}
 <div class="details-container">
     <!-- Header Section -->
     <div class="details-header">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 10px;">
-            <div>
-                <span class="category-tag">{{ recipe.category or 'General' }}</span>
-                <span class="difficulty-tag" style="margin-left: 8px;">⚡ {{ recipe.difficulty or 'Easy' }}</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 12px;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <span class="category-tag">
+                    <i class="fa-solid fa-tag"></i> {{ recipe.category or 'General' }}
+                </span>
+                <span class="difficulty-tag">
+                    <i class="fa-solid fa-gauge-high"></i> {{ recipe.difficulty or 'Easy' }}
+                </span>
                 {% if recipe.language == 'hi' %}
-                    <span class="difficulty-tag" style="margin-left: 8px;">🌐 हिन्दी</span>
+                    <span class="difficulty-tag"><i class="fa-solid fa-globe"></i> हिन्दी</span>
                 {% elif recipe.language == 'mr' %}
-                    <span class="difficulty-tag" style="margin-left: 8px;">🌐 मराठी</span>
+                    <span class="difficulty-tag"><i class="fa-solid fa-globe"></i> मराठी</span>
                 {% endif %}
             </div>
 
-            <!-- Print Button (Triggers window.print) -->
-            <button id="btn-print-recipe" class="btn btn-outline" style="padding: 7px 15px; font-size: 0.88rem;">
-                🖨️ Print Recipe
-            </button>
+            <!-- Print / Back Buttons -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button id="btn-print-recipe" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.88rem;">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
+                <a href="{{ url_for('recipes') }}" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.88rem;">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Recipes
+                </a>
+            </div>
         </div>
 
         <h1 class="details-title">{{ recipe.title }}</h1>
@@ -29,23 +38,23 @@
         <!-- Meta ribbon -->
         <div class="details-meta-ribbon">
             <div class="meta-pill">
-                <span>⏱️</span>
+                <i class="fa-regular fa-clock text-primary"></i>
                 <span><strong>Prep:</strong> {{ recipe.prep_time }}</span>
             </div>
             <div class="meta-pill">
-                <span>🍳</span>
+                <i class="fa-solid fa-fire text-coral"></i>
                 <span><strong>Cook:</strong> {{ recipe.cook_time }}</span>
             </div>
             <div class="meta-pill">
-                <span>🍽️</span>
-                <span><strong>Serves:</strong> {{ recipe.servings or '2 servings' }}</span>
+                <i class="fa-solid fa-users text-primary"></i>
+                <span><strong>Servings:</strong> {{ recipe.servings or '2 servings' }}</span>
             </div>
             <div class="meta-pill">
-                <span>⚡</span>
+                <i class="fa-solid fa-gauge-high text-accent"></i>
                 <span><strong>Difficulty:</strong> {{ recipe.difficulty }}</span>
             </div>
             <div class="meta-pill">
-                <span>🥗</span>
+                <i class="fa-solid fa-bolt text-accent"></i>
                 <span><strong>Calories:</strong> {{ recipe.calories }}</span>
             </div>
         </div>
@@ -53,33 +62,40 @@
 
     <!-- Main Content: Ingredients & Instructions Grid -->
     <div class="details-grid">
-        <!-- Column 1: Ingredients -->
+        <!-- Column 1: Ingredients & Nutrition -->
         <div>
             <h2 class="section-heading">
-                <span>🧺</span> Ingredients Needed
+                <i class="fa-solid fa-basket-shopping text-primary"></i> Ingredients
             </h2>
             <div class="ingredients-card">
                 <ul class="ingredients-list">
                     {% if recipe.ingredients is iterable and recipe.ingredients is not string %}
                         {% for ing in recipe.ingredients %}
-                            <li>
-                                <span class="check-dot">✔</span>
+                            <li style="cursor: pointer;" onclick="this.classList.toggle('checked-ingredient');" title="Click to cross off as you cook">
+                                <span class="check-dot">
+                                    <i class="fa-solid fa-check"></i>
+                                </span>
                                 <span>{{ ing }}</span>
                             </li>
                         {% endfor %}
                     {% else %}
-                        <li>{{ recipe.ingredients }}</li>
+                        <li>
+                            <span class="check-dot">
+                                <i class="fa-solid fa-check"></i>
+                            </span>
+                            <span>{{ recipe.ingredients }}</span>
+                        </li>
                     {% endif %}
                 </ul>
             </div>
 
             <!-- Nutritional Info Box -->
-            <div class="nutrition-box" style="margin-top: 25px;">
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary-green); margin-bottom: 5px;">
-                    📊 Estimated Nutritional Values
+            <div class="nutrition-box" style="margin-top: 24px;">
+                <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
+                    <i class="fa-solid fa-chart-pie text-primary"></i> Nutrition Estimates
                 </h3>
-                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
-                    Approximate values per serving:
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Approximate nutritional values per serving:
                 </p>
                 <div class="nutrition-pills">
                     {% if recipe.nutrition is mapping %}
@@ -100,7 +116,7 @@
         <!-- Column 2: Step-by-Step Cooking Steps -->
         <div>
             <h2 class="section-heading">
-                <span>🍳</span> Step-by-Step Cooking Instructions
+                <i class="fa-solid fa-kitchen-set text-primary"></i> Step-by-Step Directions
             </h2>
 
             <ol class="instructions-list">
@@ -116,7 +132,9 @@
             <!-- Chef Tips -->
             {% if recipe.tips %}
                 <div class="callout-box callout-tips">
-                    <strong style="display: block; margin-bottom: 4px;">💡 Chef's Pro Tip:</strong>
+                    <strong style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-lightbulb"></i> Chef's Pro Tip:
+                    </strong>
                     <span>{{ recipe.tips }}</span>
                 </div>
             {% endif %}
@@ -124,7 +142,9 @@
             <!-- Substitutes -->
             {% if recipe.substitutes %}
                 <div class="callout-box callout-substitutes">
-                    <strong style="display: block; margin-bottom: 4px;">🔄 Ingredient Substitutions:</strong>
+                    <strong style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-arrows-rotate"></i> Smart Substitutions:
+                    </strong>
                     <span>{{ recipe.substitutes }}</span>
                 </div>
             {% endif %}
@@ -135,30 +155,31 @@
     <div class="details-actions-bar">
         {% if recipe.is_favourite or recipe.source == 'favourites' %}
             <button class="btn btn-accent" disabled>
-                ❤️ Saved in Favourites
+                <i class="fa-solid fa-heart"></i> Saved in Favourites
             </button>
         {% else %}
             <button
                 class="btn btn-accent btn-save-fav"
                 data-id="{{ recipe.id }}"
             >
-                ❤️ Save to Favourites
+                <i class="fa-solid fa-heart"></i> Save to Favourites
             </button>
         {% endif %}
 
         <button id="btn-shopping-list" class="btn btn-outline" data-id="{{ recipe.id }}" title="Copy shopping list to clipboard">
-            🛒 Shopping List
+            <i class="fa-solid fa-cart-shopping"></i> Copy Shopping List
         </button>
 
         <a href="{{ url_for('recipes') }}" class="btn btn-outline">
-            ← Back to Recipes
+            <i class="fa-solid fa-arrow-left"></i> Back to Recipes
         </a>
 
-        <a href="{{ url_for('chatbot') }}" class="btn btn-outline" style="margin-left: auto;">
-            👨‍🍳 Ask Chef AI
+        <a href="{{ url_for('chatbot') }}" class="btn btn-primary" style="margin-left: auto;">
+            <i class="fa-solid fa-robot"></i> Ask Chef AI About This
         </a>
     </div>
 </div>
+{% endblock %}
 
 {% block scripts %}
 <script>
@@ -173,8 +194,10 @@ document.getElementById('btn-shopping-list').addEventListener('click', function(
                     data.shopping_list.map((item, i) => (i + 1) + '. ' + item).join('\n');
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(text).then(() => {
-                        btn.innerHTML = '✅ Copied!';
-                        setTimeout(() => { btn.innerHTML = '🛒 Shopping List'; }, 2500);
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied to Clipboard!';
+                        setTimeout(() => { 
+                            btn.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> Copy Shopping List'; 
+                        }, 2500);
                     }).catch(() => alert(text));
                 } else { alert(text); }
             }

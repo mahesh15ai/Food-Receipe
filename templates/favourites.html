@@ -1,24 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}My Favourite Recipes - SQLite Saved{% endblock %}
+{% block title %}My Favourite Recipes - Mahilicious{% endblock %}
 
 {% block content %}
-<div style="margin: 25px 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+<div style="margin: 24px 0 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
     <div>
-        <h1 style="color: var(--primary-green); font-size: 1.8rem; font-weight: 800;">
-            ❤️ Saved Favourite Recipes
+        <h1 style="font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
+            <i class="fa-solid fa-heart text-coral"></i> Saved Favourites
         </h1>
-        <p style="color: var(--text-secondary); font-size: 0.95rem;">
-            Stored permanently in your local <strong>SQLite database</strong> (<code>database/recipes.db</code>).
+        <p style="color: var(--text-muted); font-size: 0.96rem;">
+            Permanently saved in your local <strong>SQLite database</strong> (<code>recipes.db</code>).
         </p>
     </div>
 
     <div>
-        <a href="{{ url_for('index') }}" class="btn btn-primary" style="padding: 9px 18px; font-size: 0.9rem;">
-            + Generate More Recipes
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Generate More Recipes
         </a>
     </div>
 </div>
+
+{% if not current_user %}
+<div class="alert-banner alert-info" style="margin-bottom: 24px;">
+    <div class="alert-content">
+        <i class="fa-solid fa-circle-user alert-icon"></i>
+        <span>Browsing as guest. <a href="{{ url_for('login') }}" style="font-weight: 700; color: inherit; text-decoration: underline;">Sign In</a> or <a href="{{ url_for('register') }}" style="font-weight: 700; color: inherit; text-decoration: underline;">Create an Account</a> to sync and access your favourite recipes across all your devices!</span>
+    </div>
+</div>
+{% endif %}
 
 <div id="favourites-container">
     {% if favourites and favourites|length > 0 %}
@@ -28,8 +37,12 @@
                     <div>
                         <!-- Header Badges -->
                         <div class="card-header-badges">
-                            <span class="category-tag">{{ fav.category or 'General' }}</span>
-                            <span class="difficulty-tag">⚡ {{ fav.difficulty or 'Easy' }}</span>
+                            <span class="category-tag">
+                                <i class="fa-solid fa-tag"></i> {{ fav.category or 'General' }}
+                            </span>
+                            <span class="difficulty-tag">
+                                <i class="fa-solid fa-gauge-high"></i> {{ fav.difficulty or 'Easy' }}
+                            </span>
                         </div>
 
                         <!-- Recipe Title -->
@@ -41,33 +54,36 @@
                         <!-- Stats Bar -->
                         <div class="recipe-stats-row">
                             <div class="stat-item">
-                                ⏱️ <span>{{ fav.prep_time }}</span>
+                                <i class="fa-regular fa-clock text-primary"></i>
+                                <span>{{ fav.prep_time }}</span>
                             </div>
                             <div class="stat-item">
-                                🍳 <span>{{ fav.cook_time }}</span>
+                                <i class="fa-solid fa-fire text-coral"></i>
+                                <span>{{ fav.cook_time }}</span>
                             </div>
                             <div class="stat-item">
-                                🥗 <span>{{ fav.calories }}</span>
+                                <i class="fa-solid fa-bolt text-accent"></i>
+                                <span>{{ fav.calories }}</span>
                             </div>
                         </div>
 
                         <!-- Saved timestamp -->
-                        <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
-                            📅 Saved on: {{ fav.created_at }}
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">
+                            <i class="fa-regular fa-calendar-check text-primary"></i> Saved on {{ fav.created_at }}
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="card-actions">
                         <a href="{{ url_for('recipe_details', recipe_id=fav.id) }}" class="btn btn-primary">
-                            📖 View Full Recipe
+                            View Steps <i class="fa-solid fa-arrow-right"></i>
                         </a>
                         <button 
                             class="btn btn-outline-danger btn-remove-fav" 
                             data-id="{{ fav.id }}"
-                            title="Delete this recipe from SQLite database"
+                            title="Delete this recipe from your SQLite database"
                         >
-                            🗑️ Remove
+                            <i class="fa-solid fa-trash-can"></i> Remove
                         </button>
                     </div>
                 </div>
@@ -75,13 +91,17 @@
         </div>
     {% else %}
         <!-- Empty State -->
-        <div class="generator-card" style="text-align: center; padding: 50px 20px;">
-            <span style="font-size: 3rem;">📖</span>
-            <h2 style="color: var(--primary-green); margin: 15px 0 10px;">No Favourite Recipes Yet</h2>
-            <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 25px;">
-                You haven't saved any recipes to your favourites yet. Generate some recipes from your kitchen ingredients and click <strong>"❤️ Save"</strong>!
+        <div class="generator-card" style="text-align: center; padding: 60px 24px; margin-top: 20px;">
+            <div class="empty-icon-wrap">
+                <i class="fa-regular fa-heart text-coral"></i>
+            </div>
+            <h2 style="font-size: 1.7rem; font-weight: 800; color: var(--text-primary); margin: 18px 0 10px;">No Favourite Recipes Yet</h2>
+            <p style="color: var(--text-muted); max-width: 520px; margin: 0 auto 28px; font-size: 1.05rem;">
+                You haven't saved any recipes to your collection yet. Generate custom recipes from your kitchen ingredients and click <strong>"Save"</strong> to keep them here forever!
             </p>
-            <a href="{{ url_for('index') }}" class="btn btn-primary">🍲 Generate Recipes Now</a>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Recipes Now
+            </a>
         </div>
     {% endif %}
 </div>

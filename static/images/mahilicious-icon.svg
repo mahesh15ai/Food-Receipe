@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <!-- Golden Sparkle Accent Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE68A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+
+    <!-- White Utensil Glow -->
+    <linearGradient id="whiteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E2E8F0" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0F172A" flood-opacity="0.25" />
+    </filter>
+
+    <filter id="innerGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#FFFFFF" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Squircle App Icon Base -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#bgGrad)" filter="url(#shadow)" />
+
+  <!-- Subtle Inner Border Highlight -->
+  <rect x="26" y="26" width="460" height="460" rx="110" fill="none" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="3" />
+
+  <!-- Background Decorative Cloche Arc / Steam Rings -->
+  <path d="M156 370 C 156 250, 356 250, 356 370" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="14" stroke-linecap="round" />
+  <circle cx="256" cy="230" r="14" fill="#FFFFFF" fill-opacity="0.15" />
+
+  <!-- Chef Hat Base -->
+  <g transform="translate(0, -10)" filter="url(#innerGlow)">
+    <!-- Chef Hat Puffs -->
+    <path d="M190 220 
+             C 170 190, 175 140, 215 130 
+             C 230 100, 282 100, 297 130 
+             C 337 140, 342 190, 322 220 Z" 
+          fill="url(#whiteGrad)" />
+    
+    <!-- Chef Hat Band -->
+    <rect x="186" y="222" width="140" height="26" rx="6" fill="#F1F5F9" />
+    <line x1="200" y1="235" x2="312" y2="235" stroke="#CBD5E1" stroke-width="3" stroke-linecap="round" />
+  </g>
+
+  <!-- Stylized "M" Formed by Culinary Fork & Knife -->
+  <g transform="translate(0, 20)">
+    <!-- Cloche Plate / Dish Base Line -->
+    <path d="M140 376 L372 376" stroke="url(#whiteGrad)" stroke-width="12" stroke-linecap="round" />
+
+    <!-- Left Fork (Tines & Stem) -->
+    <g fill="none" stroke="url(#whiteGrad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Fork Prongs -->
+      <path d="M196 280 L196 312 C196 324, 216 324, 216 312 L216 280" />
+      <path d="M206 280 L206 322" />
+      <!-- Fork Neck to Center "M" Arch -->
+      <path d="M206 324 L206 364" />
+      <path d="M206 324 L256 354" stroke-width="10" />
+    </g>
+
+    <!-- Right Knife / Spoon (Blade to Center "M" Arch) -->
+    <g fill="none" stroke="url(#whiteGrad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M306 280 C318 280, 318 316, 306 324 L306 364" />
+      <path d="M306 324 L256 354" stroke-width="10" />
+    </g>
+
+    <!-- Center Culinary Pearl / Join -->
+    <circle cx="256" cy="354" r="8" fill="url(#goldGrad)" />
+  </g>
+
+  <!-- AI Magic Sparkles (Top Right) -->
+  <g transform="translate(360, 110)">
+    <!-- Primary 4-Point Star -->
+    <path d="M0 -32 Q0 0 32 0 Q0 0 0 32 Q0 0 -32 0 Q0 0 0 -32 Z" fill="url(#goldGrad)" filter="url(#shadow)" />
+    <!-- Secondary Small Star -->
+    <path d="M36 -28 Q36 -12 52 -12 Q36 -12 36 4 Q36 -12 20 -12 Q36 -12 36 -28 Z" fill="#FDE68A" />
+  </g>
+
+  <!-- Small AI Sparkle (Bottom Left) -->
+  <g transform="translate(130, 270)">
+    <path d="M0 -16 Q0 0 16 0 Q0 0 0 16 Q0 0 -16 0 Q0 0 0 -16 Z" fill="url(#goldGrad)" />
+  </g>
+</svg>
+

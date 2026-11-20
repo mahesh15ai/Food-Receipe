@@ -38,7 +38,7 @@ except ImportError:
 
 # Fetch Gemini API Key & Model Configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
+DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
 
 # Import the Google GenAI SDK
 GENAI_SDK_AVAILABLE = False
@@ -101,14 +101,16 @@ def get_gemini_client():
 def call_gemini_with_fallback(client, contents):
     """
     Calls Gemini API with fast model fallback.
-    Tries the configured model first, then immediate fast fallbacks with zero delay
-    to minimize user waiting time.
+    Tries the fastest, highest-availability models first:
+    1. gemini-3.5-flash-lite (Ultra-fast, lowest latency ~2-3s)
+    2. gemini-3.8-flash (Standard model)
+    3. gemini-3.6-flash (Active preview fallback)
     """
-    preferred_model = os.getenv("GEMINI_MODEL", DEFAULT_MODEL).strip()
+    preferred_model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
 
-    # Fast fallback list
+    # Fast fallback list: only active, supported models for this API key
     candidates = [preferred_model]
-    for fallback in ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-3.8-flash"]:
+    for fallback in ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.6-flash"]:
         if fallback not in candidates:
             candidates.append(fallback)
 

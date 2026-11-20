@@ -1,32 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Chef AI Chatbot - Cooking Assistant{% endblock %}
+{% block title %}Chef AI Chatbot - Mahilicious{% endblock %}
 
 {% block content %}
 <div class="chat-container">
     <!-- Chatbot Header -->
     <div class="chat-header">
         <div class="chat-chef-info">
-            <span class="chef-avatar">👨‍🍳</span>
+            <div class="chef-avatar">
+                <i class="fa-solid fa-robot"></i>
+            </div>
             <div>
-                <h1 class="chat-chef-title">Chef AI Assistant</h1>
-                <p class="chat-chef-sub">Ask anything — recipes, substitutes, tips, timings, storage ⚡ Fast answers</p>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h1 class="chat-chef-title">Chef AI Assistant</h1>
+                    <span class="brand-tag">Online</span>
+                </div>
+                <p class="chat-chef-sub">Ask anything: recipes, substitutions, timings, pairings, and storage advice.</p>
             </div>
         </div>
 
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <!-- Daily Tip Button -->
-            <button id="btn-daily-tip" class="btn btn-outline" style="padding:6px 12px; font-size:0.82rem;">
-                💡 Random Tip
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <!-- Random Tip Button -->
+            <button id="btn-daily-tip" class="btn btn-outline" style="padding: 7px 14px; font-size: 0.85rem;">
+                <i class="fa-solid fa-lightbulb text-accent"></i> Random Cooking Tip
             </button>
-            <!-- Chat Language Selector -->
-            <div>
-                <label for="chat-language" style="font-size: 0.8rem; font-weight: 700; color: var(--primary-green-dark); margin-right: 5px;">Language:</label>
-                <select id="chat-language" class="select-box" style="padding: 6px 10px; font-size: 0.85rem; width: auto; display: inline-block;">
-                    <option value="en" selected>English</option>
-                    <option value="hi">हिन्दी (Hindi)</option>
-                    <option value="mr">मराठी (Marathi)</option>
-                </select>
+            
+            <!-- Language Selector -->
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <label for="chat-language" style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted);">
+                    <i class="fa-solid fa-globe"></i> Language:
+                </label>
+                <div class="select-wrapper" style="display: inline-block;">
+                    <select id="chat-language" class="select-box" style="padding: 7px 32px 7px 12px; font-size: 0.85rem; width: auto;">
+                        <option value="en" selected>English</option>
+                        <option value="hi">हिन्दी (Hindi)</option>
+                        <option value="mr">मराठी (Marathi)</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -36,53 +46,175 @@
         <!-- Default Welcome Message from Bot -->
         <div class="message-row bot-row">
             <div class="message-bubble">
-                👨‍🍳 Hello! I'm your <strong>Chef AI</strong> — ask me anything about cooking!
+                <div style="font-weight: 700; color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-robot"></i> Chef AI
+                </div>
+                Hello! I am your AI Culinary Assistant. I can help you brainstorm dishes, find quick ingredient substitutes, adjust spice levels, or give step-by-step cooking advice.
                 <br><br>
-                Try asking:
-                <ul style="margin: 8px 0 0 20px;">
-                    <li><em>"What can I cook with potatoes and onions?"</em></li>
-                    <li><em>"How do I make a quick paneer curry?"</em></li>
-                    <li><em>"Healthy 15-minute breakfast ideas?"</em></li>
-                    <li><em>"What replaces eggs in baking?"</em></li>
-                    <li><em>"How long to boil pasta?"</em></li>
+                <strong>Try tapping one of the suggested prompts below or ask directly:</strong>
+                <ul style="margin: 10px 0 0 20px; display: flex; flex-direction: column; gap: 6px;">
+                    <li><i class="fa-solid fa-chevron-right text-primary" style="font-size: 0.75rem;"></i> <em>"What can I cook with potatoes and onions?"</em></li>
+                    <li><i class="fa-solid fa-chevron-right text-primary" style="font-size: 0.75rem;"></i> <em>"How do I make restaurant-style paneer curry?"</em></li>
+                    <li><i class="fa-solid fa-chevron-right text-primary" style="font-size: 0.75rem;"></i> <em>"What can I replace eggs with in a cake?"</em></li>
+                    <li><i class="fa-solid fa-chevron-right text-primary" style="font-size: 0.75rem;"></i> <em>"How do I keep boiled rice separate and fluffy?"</em></li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <!-- Quick Question Suggestion Chips -->
+    <!-- Quick Question Suggestion Chips with Vector Icons -->
     <div class="chat-quick-chips">
-        <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Try Asking:</span>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I cook with potatoes and onions?">🥔 Potatoes & onions?</button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="How do I make a quick paneer curry?">🧀 Quick paneer curry?</button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="Suggest a healthy 15-minute breakfast.">🍳 15-min breakfast?</button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I use instead of tomatoes in curry?">🍅 Tomato substitute?</button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="How do I make fluffy rice?">🍚 Fluffy rice?</button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="Give me a simple egg recipe.">🥚 Egg recipe?</button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="What spices go well with chicken?">🍗 Chicken spices?</button>
-        <button type="button" class="chip-btn chat-chip-btn" data-query="How to reduce spiciness in a curry?">🌶️ Less spicy curry?</button>
+        <span class="chips-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Try Asking:</span>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I cook with potatoes and onions?">
+            <i class="fa-solid fa-circle-dot"></i> Potatoes & onions?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="How do I make a quick paneer curry?">
+            <i class="fa-solid fa-cheese text-accent"></i> Quick paneer curry?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="Suggest a healthy 15-minute breakfast.">
+            <i class="fa-solid fa-egg text-accent"></i> 15-min breakfast?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="What can I use instead of tomatoes in curry?">
+            <i class="fa-solid fa-circle text-coral"></i> Tomato substitute?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="How do I make fluffy rice?">
+            <i class="fa-solid fa-bowl-rice text-accent"></i> Fluffy rice?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="Give me a simple egg recipe.">
+            <i class="fa-solid fa-egg"></i> Egg recipe?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="What spices go well with chicken?">
+            <i class="fa-solid fa-drumstick-bite text-coral"></i> Chicken spices?
+        </button>
+        <button type="button" class="chip-btn chat-chip-btn" data-query="How to reduce spiciness in a curry?">
+            <i class="fa-solid fa-pepper-hot text-coral"></i> Less spicy curry?
+        </button>
     </div>
 
     <!-- Chat Input Form -->
-    <form class="chat-input-area" id="chat-form">
-        <input
-            type="text"
-            id="chat-input"
-            class="chat-input"
-            placeholder="Ask anything: recipe ideas, cooking tips, substitutes, timings..."
-            autocomplete="off"
-            required
-        >
-        <button type="submit" class="btn btn-primary" style="padding: 12px 20px;">
-            Send 🚀
-        </button>
-    </form>
+    {% if current_user %}
+        <form class="chat-input-area" id="chat-form">
+            <input
+                type="text"
+                id="chat-input"
+                class="chat-input"
+                placeholder="Ask anything: recipe ideas, substitute questions, timings, spice fixes..."
+                autocomplete="off"
+                required
+            >
+            <button type="submit" class="btn btn-primary" style="padding: 12px 24px;">
+                <i class="fa-solid fa-paper-plane"></i> Send
+            </button>
+        </form>
+    {% else %}
+        <div class="chat-input-locked" id="chat-guest-trigger" role="button" tabindex="0" title="Click to sign in">
+            <div class="chat-input-locked-info">
+                <i class="fa-solid fa-lock text-coral" style="font-size: 1.15rem;"></i>
+                <span>Sign in required to chat with Chef AI. Click to unlock &rarr;</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+            </button>
+        </div>
+    {% endif %}
 </div>
+
+{% if not current_user %}
+<!-- Chatbot Auth Required Popup Modal -->
+<div class="modal-overlay open" id="chat-auth-modal" role="dialog" aria-modal="true" aria-labelledby="chat-modal-title">
+    <div class="modal-card" style="max-width: 480px; text-align: center; padding: 28px 24px;">
+        <div class="modal-header" style="justify-content: flex-end; border-bottom: none; margin-bottom: 0;">
+            <button type="button" class="modal-close-btn" id="close-chat-modal" aria-label="Close dialog">&times;</button>
+        </div>
+        
+        <!-- Animated Chef Lock Badge -->
+        <div style="width: 76px; height: 76px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2.5px solid #a7f3d0; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.15);">
+            <i class="fa-solid fa-robot" style="font-size: 2.2rem; color: var(--primary);"></i>
+            <span style="position: absolute; bottom: -2px; right: -2px; width: 28px; height: 28px; background: #ef4444; color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; border: 2.5px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                <i class="fa-solid fa-lock"></i>
+            </span>
+        </div>
+
+        <h2 id="chat-modal-title" style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+            Sign In Required for Chef AI
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.94rem; line-height: 1.5; margin-bottom: 22px;">
+            Please sign in or create a free Mahilicious account to ask culinary questions, get ingredient substitutes, adjust spice levels, and learn expert cooking techniques.
+        </p>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="{{ url_for('login_google') }}" class="btn btn-google btn-block" style="justify-content: center; padding: 11px 18px;">
+                <svg viewBox="0 0 24 24" width="20" height="20" class="google-svg-icon">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                <span>Continue with Google</span>
+            </a>
+
+            <a href="{{ url_for('login', next=url_for('chatbot')) }}" class="btn btn-primary btn-block" style="justify-content: center; padding: 11px 18px;">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Account
+            </a>
+
+            <a href="{{ url_for('register') }}" class="btn btn-outline btn-block" style="justify-content: center; padding: 11px 18px;">
+                <i class="fa-solid fa-user-plus"></i> Create Free Account
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
 <script>
-// Daily tip button
+{% if not current_user %}
+// Chat Auth Modal Controls for Guests
+const chatModal = document.getElementById('chat-auth-modal');
+const closeChatModalBtn = document.getElementById('close-chat-modal');
+const chatGuestTrigger = document.getElementById('chat-guest-trigger');
+
+function openChatAuthModal() {
+    if (chatModal) chatModal.classList.add('open');
+}
+
+function closeChatAuthModal() {
+    if (chatModal) chatModal.classList.remove('open');
+}
+
+if (closeChatModalBtn) closeChatModalBtn.addEventListener('click', closeChatAuthModal);
+
+// Close when clicking outside modal card
+if (chatModal) {
+    chatModal.addEventListener('click', function(e) {
+        if (e.target === chatModal) closeChatAuthModal();
+    });
+}
+
+// Re-open modal if guest clicks locked input
+if (chatGuestTrigger) chatGuestTrigger.addEventListener('click', openChatAuthModal);
+
+// Re-open modal if guest clicks question chips
+document.querySelectorAll('.chat-chip-btn').forEach(function(chip) {
+    chip.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openChatAuthModal();
+    });
+});
+
+// Re-open modal if guest clicks random tip
+const dailyTipBtn = document.getElementById('btn-daily-tip');
+if (dailyTipBtn) {
+    dailyTipBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openChatAuthModal();
+    }, true);
+}
+{% else %}
+// Random tip trigger for logged-in user
 document.getElementById('btn-daily-tip').addEventListener('click', function() {
     fetch('/api/random-tip')
         .then(r => r.json())
@@ -93,14 +225,15 @@ document.getElementById('btn-daily-tip').addEventListener('click', function() {
                 row.className = 'message-row bot-row';
                 const bubble = document.createElement('div');
                 bubble.className = 'message-bubble';
-                bubble.style.background = 'linear-gradient(135deg, #E8F5E9, #F1F8E9)';
-                bubble.style.borderLeft = '4px solid var(--primary-green)';
-                bubble.innerHTML = '<strong>💡 Chef\'s Random Tip:</strong><br>' + data.tip;
+                bubble.style.background = 'linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%)';
+                bubble.style.border = '1px solid #A7F3D0';
+                bubble.innerHTML = '<strong style="color: var(--primary); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-lightbulb text-accent"></i> Chef\'s Kitchen Tip:</strong><div style="margin-top: 4px;">' + data.tip + '</div>';
                 row.appendChild(bubble);
                 chatMessages.appendChild(row);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         });
 });
+{% endif %}
 </script>
 {% endblock %}

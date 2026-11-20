@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 180" width="100%" height="100%">
+  <defs>
+    <!-- Brand Gradients -->
+    <linearGradient id="brandEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+
+    <linearGradient id="brandGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+
+    <linearGradient id="textAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="70%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <!-- Shadow -->
+    <filter id="logoShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#059669" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Left Icon Container -->
+  <g transform="translate(20, 20)">
+    <!-- Squircle Icon Box -->
+    <rect x="0" y="0" width="140" height="140" rx="36" fill="url(#brandEmerald)" filter="url(#logoShadow)" />
+    <rect x="1" y="1" width="138" height="138" rx="35" fill="none" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="2" />
+
+    <!-- Chef Hat Minimal Silhouette -->
+    <path d="M50 64 C 42 54, 44 38, 58 34 C 64 24, 82 24, 88 34 C 102 38, 104 54, 96 64 Z" fill="#FFFFFF" />
+    <rect x="49" y="65" width="48" height="9" rx="3" fill="#F1F5F9" />
+
+    <!-- Fork & Knife Forming "M" -->
+    <g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Fork Prongs -->
+      <path d="M54 84 L54 96 C54 100, 62 100, 62 96 L62 84" />
+      <path d="M58 84 L58 100" />
+      <path d="M58 100 L58 116" />
+      <path d="M58 100 L73 112" stroke-width="4" />
+
+      <!-- Knife Blade -->
+      <path d="M92 84 C97 84, 97 98, 92 102 L92 116" />
+      <path d="M92 102 L73 112" stroke-width="4" />
+    </g>
+
+    <circle cx="73" cy="112" r="3.5" fill="url(#brandGold)" />
+
+    <!-- AI Sparkle -->
+    <path d="M106 32 Q106 42 116 42 Q106 42 106 52 Q106 42 96 42 Q106 42 106 32 Z" fill="url(#brandGold)" />
+  </g>
+
+  <!-- Typography Right -->
+  <g transform="translate(186, 0)">
+    <!-- Brand Name: Mahi + licious -->
+    <text x="0" y="98" font-family="'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="800" letter-spacing="-1.5">
+      <tspan fill="#0F172A">Mahi</tspan><tspan fill="url(#textAccent)">licious</tspan>
+    </text>
+
+    <!-- Version / Tech Pill -->
+    <g transform="translate(382, 54)">
+      <rect x="0" y="0" width="76" height="28" rx="14" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1.5" />
+      <text x="38" y="19" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="800" fill="#059669" text-anchor="middle" letter-spacing="0.5">
+        AI v2.0
+      </text>
+    </g>
+
+    <!-- Subtitle / Tagline -->
+    <text x="2" y="132" font-family="'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#64748B" letter-spacing="3.5">
+      SMART INGREDIENT RECIPE GENERATOR
+    </text>
+  </g>
+</svg>
+

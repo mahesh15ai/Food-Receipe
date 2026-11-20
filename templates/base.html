@@ -2,66 +2,135 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AI Food Recipe Generator{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}Mahilicious - AI Food Recipe Generator{% endblock %}</title>
     
-    <!-- Student Project CSS Stylesheet -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 Professional Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Professional Responsive Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.8">
     
-    <!-- Favicon icon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
+    <!-- Vector Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/mahilicious-icon.svg') }}" type="image/svg+xml">
 </head>
 <body>
 
-    <!-- Simple, Clean Navigation Bar -->
+    <!-- Professional Navigation Bar -->
     <header class="navbar">
         <div class="nav-container">
             <a href="{{ url_for('index') }}" class="nav-brand">
-                <span>🍲</span> RecipeAI
+                <div class="brand-icon-wrapper" style="padding: 2px; overflow: hidden;">
+                    <img src="{{ url_for('static', filename='images/mahilicious-icon.svg') }}" alt="Mahilicious Logo" style="width: 100%; height: 100%; border-radius: 8px; display: block;">
+                </div>
+                <div class="brand-title-wrap">Mahi<span class="brand-accent">licious</span></div>
+                <span class="brand-tag">v2.0</span>
             </a>
 
-            <nav>
+            <!-- Mobile Hamburger Toggle Button -->
+            <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+
+            <!-- Navigation Menu -->
+            <nav class="nav-menu" id="nav-menu">
                 <ul class="nav-links">
-                    <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">🏠 Home</a></li>
-                    <li><a href="{{ url_for('recipes') }}" class="{% if request.endpoint in ['recipes', 'recipe_details'] %}active{% endif %}">📖 Recipes</a></li>
-                    <li><a href="{{ url_for('chatbot') }}" class="{% if request.endpoint == 'chatbot' %}active{% endif %}">👨‍🍳 Chef Chatbot</a></li>
                     <li>
-                        <a href="{{ url_for('favourites') }}" class="{% if request.endpoint == 'favourites' %}active{% endif %}">
-                            ❤️ Favourites 
-                            <span class="count-badge" id="fav-count-badge">{{ fav_count }}</span>
+                        <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">
+                            <i class="fa-solid fa-house nav-icon"></i> <span>Home</span>
                         </a>
                     </li>
                     <li>
-                        {% if api_ready %}
-                            <span class="api-pill active" title="AI Assistant is active">🟢 AI Ready</span>
-                        {% else %}
-                            <span class="api-pill inactive" title="Set GEMINI_API_KEY in .env file">🔴 Setup Key</span>
-                        {% endif %}
+                        <a href="{{ url_for('recipes') }}" class="{% if request.endpoint in ['recipes', 'recipe_details'] %}active{% endif %}">
+                            <i class="fa-solid fa-book-open nav-icon"></i> <span>Recipes</span>
+                        </a>
                     </li>
+                    <li>
+                        <a href="{{ url_for('chatbot') }}" class="{% if request.endpoint == 'chatbot' %}active{% endif %}">
+                            <i class="fa-solid fa-robot nav-icon"></i> <span>Chef Chatbot</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('favourites') }}" class="{% if request.endpoint == 'favourites' %}active{% endif %}">
+                            <i class="fa-solid fa-heart nav-icon text-coral"></i> <span>Favourites</span>
+                            <span class="count-badge" id="fav-count-badge">{{ fav_count }}</span>
+                        </a>
+                    </li>
+
+                    <!-- User Authentication State -->
+                    {% if current_user %}
+                    <li class="nav-user-item">
+                        <a href="{{ url_for('profile') }}" class="user-nav-pill {% if request.endpoint == 'profile' %}active{% endif %}" title="View {{ current_user.name }}'s profile">
+                            <span class="user-avatar-tiny" style="background-color: {{ current_user.avatar_color or '#059669' }};">
+                                {{ current_user.name[0]|upper }}
+                            </span>
+                            <span class="user-nav-name">{{ current_user.name.split()[0] }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-logout-item">
+                        <a href="{{ url_for('logout') }}" class="btn-nav-logout" title="Sign Out">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span class="logout-label">Sign Out</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-auth-item">
+                        <a href="{{ url_for('login') }}" class="btn-nav-login {% if request.endpoint == 'login' %}active{% endif %}">
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                            <span>Sign In</span>
+                        </a>
+                    </li>
+                    <li class="nav-auth-item">
+                        <a href="{{ url_for('register') }}" class="btn-nav-register {% if request.endpoint == 'register' %}active{% endif %}">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Sign Up</span>
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Content Container -->
     <main class="container">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
                     <div class="alert-banner alert-{{ category }}">
-                        <span>{{ message }}</span>
+                        <div class="alert-content">
+                            <i class="fa-solid fa-circle-info alert-icon"></i>
+                            <span>{{ message }}</span>
+                        </div>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- Friendly Banner if API Key is Missing -->
+        <!-- Refined API Key Notice Banner if Missing -->
         {% if not api_ready %}
             <div class="alert-banner alert-warning">
-                <div>
-                    <strong>🔑 Notice:</strong> API Key is not yet configured in your <code>.env</code> file.
-                    Please add your <code>GEMINI_API_KEY</code> from <a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: underline; font-weight: bold;">Google AI Studio</a> to generate recipes and chat with Chef AI.
+                <div class="alert-content">
+                    <i class="fa-solid fa-key alert-icon"></i>
+                    <div>
+                        <strong>Gemini API Key Required:</strong> To unlock AI recipe generation and Chef AI answers, add your free key in the <code>.env</code> file.
+                    </div>
+                </div>
+                <div class="alert-actions">
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn btn-accent btn-sm">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Get Free Key
+                    </a>
+                    <button type="button" class="btn btn-outline btn-sm" id="banner-modal-trigger">
+                        <i class="fa-solid fa-circle-question"></i> How to Setup
+                    </button>
                 </div>
             </div>
         {% endif %}
@@ -69,15 +138,67 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
+    <!-- Setup Key Guide Modal -->
+    <div class="modal-overlay" id="api-key-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="icon-bubble">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <h2 class="modal-title">Configure Gemini API Key</h2>
+                </div>
+                <button type="button" class="modal-close-btn" id="close-api-modal" aria-label="Close modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 14px;">Follow these simple steps to activate instant AI recipe generation:</p>
+                <ol class="modal-steps-list">
+                    <li>
+                        Visit <a href="https://aistudio.google.com/app/apikey" target="_blank" style="font-weight: 700; color: var(--primary);">Google AI Studio</a> and sign in with your Google account.
+                    </li>
+                    <li>Click <strong>"Create API Key"</strong> and copy your new key.</li>
+                    <li>
+                        Open the <code>.env</code> file in your project folder and paste your key:
+                        <div class="code-snippet-box">
+                            GEMINI_API_KEY=AIzaSy...your_real_key_here
+                        </div>
+                    </li>
+                    <li>Save the file. Your key updates instantly without restarting the server!</li>
+                </ol>
+                <div class="modal-footer-actions">
+                    <button type="button" class="btn btn-outline" id="close-api-modal-btn">Got It</button>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn btn-primary">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Google AI Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Clean Footer -->
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 <strong>AI Food Recipe Generator</strong> &bull; Cook delicious meals with everyday ingredients</p>
+        <div class="container footer-container">
+            <div class="footer-copy">
+                &copy; 2026 <strong>Mahilicious</strong> &bull; Powered by Google Gemini 3.8 Flash & Flask
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('index') }}"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="{{ url_for('recipes') }}"><i class="fa-solid fa-book-open"></i> Recipes</a>
+                <a href="{{ url_for('chatbot') }}"><i class="fa-solid fa-robot"></i> Chef Chatbot</a>
+                <a href="{{ url_for('favourites') }}"><i class="fa-solid fa-heart"></i> Favourites</a>
+                {% if current_user %}
+                    <a href="{{ url_for('profile') }}"><i class="fa-solid fa-user"></i> My Profile</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}"><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In</a>
+                {% endif %}
+            </div>
         </div>
     </footer>
 
     <!-- Client-Side JavaScript -->
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=2.8"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
