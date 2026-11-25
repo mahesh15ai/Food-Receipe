@@ -739,8 +739,9 @@ def api_random_tip():
 # Run Application
 # -----------------------------------------------------------
 if __name__ == "__main__":
+    port = int(os.getenv("PORT", 3001))
     print("==================================================")
     print("  🍲 Mahilicious - AI Food Recipe Generator Starting... ")
-    print("  Open your browser at: http://127.0.0.1:5000    ")
+    print(f"  Open your browser at: http://127.0.0.1:{port}    ")
     print("==================================================")
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=port, debug=True)
